@@ -192,45 +192,137 @@
             <div class="stamp-box locked" id="box-1">
                 <div class="booth-number">BOOTH 1</div>
                 <div class="secret-icon">❓</div>
-                <img src="./⑬パウラーナー.jpg" class="maker-logo" alt="ロゴ">
+                <img src="./logo1.jpg" class="maker-logo" alt="ロゴ">
                 <div class="maker-name" id="name-1">？？？ (ロック中)</div>
                 <div class="stamp-badge">🍺</div>
             </div>
             <div class="stamp-box locked" id="box-2">
                 <div class="booth-number">BOOTH 2</div>
                 <div class="secret-icon">❓</div>
-                <img src="./12.ハッカープショール.jpg" class="maker-logo" alt="ロゴ">
+                <img src="./logo2.jpg" class="maker-logo" alt="ロゴ">
                 <div class="maker-name" id="name-2">？？？ (ロック中)</div>
                 <div class="stamp-badge">🍺</div>
             </div>
             <div class="stamp-box locked" id="box-3">
                 <div class="booth-number">BOOTH 3</div>
                 <div class="secret-icon">❓</div>
-                <img src="./08.ホフブロイ.png" class="maker-logo" alt="ロゴ">
+                <img src="./logo3.png" class="maker-logo" alt="ロゴ">
                 <div class="maker-name" id="name-3">？？？ (ロック中)</div>
                 <div class="stamp-badge">🍺</div>
             </div>
             <div class="stamp-box locked" id="box-4">
                 <div class="booth-number">BOOTH 4</div>
                 <div class="secret-icon">❓</div>
-                <img src="./11.カーメリテン.png" class="maker-logo" alt="ロゴ">
+                <img src="./logo4.png" class="maker-logo" alt="ロゴ">
                 <div class="maker-name" id="name-4">？？？ (ロック中)</div>
                 <div class="stamp-badge">🍺</div>
             </div>
             <div class="stamp-box locked" id="box-5">
                 <div class="booth-number">BOOTH 5</div>
                 <div class="secret-icon">❓</div>
-                <img src="./⑫アルコブロイ [更新済み].jpg" class="maker-logo" alt="ロゴ">
+                <img src="./logo5.jpg" class="maker-logo" alt="ロゴ">
                 <div class="maker-name" id="name-5">？？？ (ロック中)</div>
                 <div class="stamp-badge">🍺</div>
             </div>
             <div class="stamp-box locked" id="box-6">
                 <div class="booth-number">BOOTH 6</div>
                 <div class="secret-icon">❓</div>
-                <img src="./2.hirschbraeu_logo-INTERNATIONAL_RZ-18_1c_vector.png" class="maker-logo" alt="ロゴ">
+                <img src="./logo6.png" class="maker-logo" alt="ロゴ">
                 <div class="maker-name" id="name-6">？？？ (ロック中)</div>
                 <div class="stamp-badge">🍺</div>
             </div>
         </div>
 
-        <button id="scan-btn" class="btn" style
+        <button id="scan-btn" class="btn" style="display: none;">📷 QRコードを読み取る</button>
+    </div>
+
+    <script>
+        const MY_LIFF_ID = "2010727861-qqi11OFO";
+        let collectedStamps = JSON.parse(localStorage.getItem('toyosu_beer_stamps')) || [];
+
+        async function startApp() {
+            try {
+                await liff.init({ liffId: MY_LIFF_ID });
+
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                    return;
+                }
+
+                const profile = await liff.getProfile();
+                document.getElementById("user-name").innerText = `${profile.displayName} さん、オクトーバーフェストへようこそ！🍻`;
+
+                updateStampCard();
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const spotId = urlParams.get('spot');
+                if (spotId) {
+                    getStamp(spotId);
+                }
+
+                const scanBtn = document.getElementById("scan-btn");
+                scanBtn.style.display = "block";
+                scanBtn.addEventListener("click", async () => {
+                    try {
+                        const result = await liff.scanCodeV2();
+                        const scannedUrl = new URL(result.value);
+                        const nextSpotId = scannedUrl.searchParams.get("spot");
+                        
+                        if (nextSpotId) {
+                            getStamp(nextSpotId);
+                        } else {
+                            alert("このQRコードはスタンプラリー用ではありません。");
+                        }
+                    } catch (err) {
+                        console.error(err);
+                    }
+                });
+
+            } catch (error) {
+                console.error("エラー", error);
+            }
+        }
+
+        function getStamp(spotId) {
+            if(spotId >= 1 && spotId <= 6) {
+                if(!collectedStamps.includes(spotId)) {
+                    collectedStamps.push(spotId);
+                    localStorage.setItem('toyosu_beer_stamps', JSON.stringify(collectedStamps));
+                    
+                    const notif = document.getElementById("notification");
+                    notif.innerText = `🎉 スタンプをGETしました！`;
+                    notif.style.display = "block";
+                    setTimeout(() => { notif.style.display = "none"; }, 3000);
+                } else {
+                    alert("このメーカーのスタンプはすでに獲得済みです！");
+                }
+                updateStampCard();
+            }
+        }
+
+        // スタンプ台紙の見た目を更新する（獲得時に本名とロゴを表示）
+        function updateStampCard() {
+            const makerNames = {
+                1: "Paulaner<br>(パウラーナー)",
+                2: "Hacker-Pschorr<br>(ハッカープショール)",
+                3: "Hofbräu<br>(ホフブロイ)",
+                4: "Karmeliten<br>(カーメリテン)",
+                5: "Arcobräu<br>(アルコブロイ)",
+                6: "Der Hirschbräu<br>(ヒルシュブロイ)"
+            };
+
+            collectedStamps.forEach(id => {
+                const box = document.getElementById(`box-${id}`);
+                const nameEl = document.getElementById(`name-${id}`);
+                if(box && nameEl) {
+                    box.classList.remove("locked");
+                    box.classList.add("got");
+                    nameEl.innerHTML = makerNames[id]; // 本名を表示
+                }
+            });
+        }
+
+        startApp();
+    </script>
+</body>
+</html>
