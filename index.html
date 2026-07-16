@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>豊洲20thスタンプラリー</title>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        body { 
+            font-family: 'Helvetica Neue', Arial, sans-serif; 
+            text-align: center; 
+            padding: 20px; 
+            background-color: #f0f7f4; 
+            color: #333; 
+        }
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #06c755;
+            font-size: 26px;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+        .card { 
+            background: white; 
+            padding: 30px 20px; 
+            border-radius: 16px; 
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08); 
+            margin-bottom: 25px; 
+        }
+        .welcome-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #222;
+            margin-bottom: 20px;
+        }
+        .status-box {
+            background-color: #f9f9f9;
+            border: 2px dashed #ccc;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .spot-name { 
+            font-size: 28px; 
+            color: #06c755; 
+            font-weight: bold;
+            margin-top: 10px; 
+        }
+        .btn { 
+            display: block; 
+            width: 100%;
+            box-sizing: border-box;
+            padding: 18px; 
+            background-color: #06c755; 
+            color: white; 
+            border: none; 
+            border-radius: 30px; 
+            font-size: 18px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            text-decoration: none; 
+            box-shadow: 0 4px 12px rgba(6, 199, 85, 0.3);
+            transition: all 0.2s;
+        }
+        .btn:active { 
+            background-color: #05a647; 
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>豊洲20thスタンプラリー</h1>
+        <p class="subtitle">〜豊洲の魅力をめぐろう！〜</p>
+
+        <div class="card">
+            <div id="user-name" class="welcome-text">LINEログインを確認中...</div>
+            
+            <div id="status-area" class="status-box">
+                <p style="margin: 0; color: #666;">現地のQRコードをスマホのカメラ、または下のボタンからスキャンしてください。</p>
+            </div>
+        </div>
+
+        <button id="scan-btn" class="btn" style="display: none;">QRコードをスキャンする</button>
+    </div>
+
+    <script>
+        // お手元の登録情報から取得した実際のLIFF IDを設定しました
+        const MY_LIFF_ID = "2010727861-qqi11OF0";
+
+        async function startApp() {
+            try {
+                // 1. LIFFの初期化
+                await liff.init({ liffId: MY_LIFF_ID });
+
+                // 2. ログインチェック（LINEアプリ以外で開いた場合にログインを促す）
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                    return;
+                }
+
+                // 3. プロフィール（LINE登録名）の取得と表示
+                const profile = await liff.getProfile();
+                document.getElementById("user-name").innerText = `ようこそ、${profile.displayName} さん！`;
+
+                // 4. スマホの通常カメラで読み取ってアクセスしてきた場合の判定（例: https://liff.line.me/2010727861-qqi11OF0?spot=豊洲公園）
+                const urlParams = new URLSearchParams(window.location.search);
+                const spot = urlParams.get('spot');
+
+                if (spot) {
+                    showStampSuccess(spot);
+                }
+
+                // 5. アプリ内カメラでのスキャン用ボタンを有効化（Scan QR機能をONにしているので使用可能）
+                const scanBtn = document.getElementById("scan-btn");
+                scanBtn.style.display = "block";
+
+                scanBtn.addEventListener("click", async () => {
+                    try {
+                        // LINEアプリ内のカメラを起動
+                        const result = await liff.scanCodeV2();
+                        
+                        // 読み取ったURLからスタンプ情報を抽出
+                        const scannedUrl = new URL(result.value);
+                        const nextSpot = scannedUrl.searchParams.get("spot");
+
+                        if (nextSpot) {
+                            showStampSuccess(nextSpot);
+                        } else {
+                            alert("スタンプラリー用のQRコードではないようです。");
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        alert("カメラの読み取りがキャンセルされたか、エラーが発生しました。");
+                    }
+                });
+
+            } catch (error) {
+                console.error("LIFFの初期化中にエラーが発生しました", error);
+                document.getElementById("user-name").innerText = "接続エラーが発生しました";
+            }
+        }
+
+        // スタンプ獲得時の画面切り替え処理
+        function showStampSuccess(spotName) {
+            const statusArea = document.getElementById("status-area");
+            statusArea.style.borderColor = "#06c755";
+            statusArea.style.backgroundColor = "#f0fdf4";
+            statusArea.innerHTML = `
+                <p style="margin: 0; font-size: 16px; font-weight: bold; color: #15803d;">🎉 スタンプをGETしました！</p>
+                <div class="spot-name">${spotName}</div>
+            `;
+        }
+
+        // アプリケーションの起動
+        startApp();
+    </script>
+</body>
+</html>
