@@ -184,7 +184,7 @@
     </div>
 
     <div class="container">
-        <div id="user-name" class="welcome-text">LINE確認中...</div>
+        <div id="user-name" class="welcome-text" style="color: #ff4d4d; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px;">LINE確認中...</div>
 
         <div id="notification"></div>
 
@@ -242,6 +242,7 @@
 
         async function startApp() {
             try {
+                // 初期化開始
                 await liff.init({ liffId: MY_LIFF_ID });
 
                 if (!liff.isLoggedIn()) {
@@ -250,7 +251,12 @@
                 }
 
                 const profile = await liff.getProfile();
-                document.getElementById("user-name").innerText = `${profile.displayName} さん、オクトーバーフェストへようこそ！🍻`;
+                
+                // 成功したら表示を戻し、ユーザー名を表示
+                const nameEl = document.getElementById("user-name");
+                nameEl.style.color = "#E69138";
+                nameEl.style.background = "none";
+                nameEl.innerText = `${profile.displayName} さん、オクトーバーフェストへようこそ！🍻`;
 
                 updateStampCard();
 
@@ -279,7 +285,8 @@
                 });
 
             } catch (error) {
-                console.error("エラー", error);
+                // 🔴 エラーが起きた場合、スマホ画面に赤文字で書き出します
+                document.getElementById("user-name").innerText = `エラー発生: ${error.message || error}`;
             }
         }
 
