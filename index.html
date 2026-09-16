@@ -84,11 +84,27 @@ body{
   38%{transform:translate(calc(-50% + var(--lean)),-4px) scale(calc(var(--s)*1.05)) rotate(var(--rot))}
   58%{transform:translate(calc(-50% + var(--lean)),-4px) scale(calc(var(--s)*1.05)) rotate(var(--rot))}
   100%{transform:translate(-50%,0) scale(var(--s)) rotate(0)}}
-.clink{position:absolute;left:50%;top:44%;width:30%;aspect-ratio:1/1;transform:translate(-50%,-50%) scale(.4);
-  opacity:0;pointer-events:none;
+/* 乾杯の瞬間。画像が読めない環境ではCSSのグラデーションだけで成立させる */
+.clink{position:absolute;left:50%;top:34%;width:30%;aspect-ratio:1/1;z-index:20;
+  transform:translate(-50%,-50%) scale(.4);opacity:0;pointer-events:none;
   background:radial-gradient(circle,rgba(255,255,255,.95) 0%,rgba(255,208,122,.65) 28%,transparent 62%)}
+/* 画像がある場合は親のスケールを止め、泡と光それぞれのモーションに任せる */
+.clink.has-img{background:none;opacity:1;transform:translate(-50%,-50%);animation:none}
 .clink.go{animation:clink .6s ease-out both}
 @keyframes clink{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}40%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.35)}}
+.burst{position:absolute;left:50%;top:50%;display:none;width:100%;height:auto;
+  transform:translate(-50%,-50%);pointer-events:none}
+.burst.ready{display:block}
+.burst.light{width:240%;opacity:0}
+.burst.foam{width:160%;opacity:0}
+.clink.go .burst.light{animation:burstLight .62s ease-out both}
+.clink.go .burst.foam{animation:burstFoam .62s cubic-bezier(.2,.8,.3,1) both}
+@keyframes burstLight{0%{opacity:0;transform:translate(-50%,-50%) scale(.35) rotate(-10deg)}
+  38%{opacity:.85;transform:translate(-50%,-50%) scale(1) rotate(4deg)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.3) rotate(14deg)}}
+@keyframes burstFoam{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}
+  34%{opacity:1;transform:translate(-50%,-50%) scale(1.02)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.28)}}
 .prost-text{position:absolute;left:0;right:0;top:26%;text-align:center;opacity:0;pointer-events:none;
   font-size:clamp(34px,11vw,48px);font-weight:900;font-style:italic;letter-spacing:.04em;color:var(--gold-l);
   text-shadow:0 3px 0 var(--amber),0 0 24px rgba(255,208,122,.7),0 6px 18px rgba(0,0,0,.6)}
@@ -172,6 +188,21 @@ body{
   text-shadow:0 2px 0 var(--amber),0 0 20px rgba(255,208,122,.5)}
 .sheet .prost{font-size:clamp(28px,9vw,36px);font-weight:900;font-style:italic;color:#fff;
   text-shadow:0 2px 0 var(--amber),0 0 22px rgba(255,208,122,.6);margin:2px 0 10px}
+/* 6ブランド制覇のメダル。リング画像が無い場合は金枠の円で成立させる */
+.medal{position:relative;width:min(62%,210px);margin:2px auto 8px;aspect-ratio:1/1;
+  display:flex;align-items:center;justify-content:center;
+  animation:medalIn .6s cubic-bezier(.34,1.5,.64,1) both}
+@keyframes medalIn{0%{opacity:0;transform:scale(.6) rotate(-8deg)}100%{opacity:1;transform:none}}
+.medal-ring{position:absolute;left:50%;top:50%;width:100%;height:auto;transform:translate(-50%,-50%);display:none}
+.medal-ring.ready{display:block}
+.medal-in{position:relative;top:-6%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:52%;aspect-ratio:1/1;border-radius:50%;
+  background:radial-gradient(circle,rgba(237,168,60,.22),rgba(7,29,56,.55));
+  border:2px solid var(--gold);transition:border-color .3s,background .3s}
+.medal.has-ring .medal-in{border:0;background:none}
+.medal-in b{font-size:clamp(30px,10vw,44px);font-weight:900;line-height:1;color:var(--gold-l);
+  text-shadow:0 2px 0 var(--amber),0 0 14px rgba(255,208,122,.6)}
+.medal-in span{margin-top:2px;font-size:8.5px;font-weight:800;letter-spacing:.14em;opacity:.9}
 .sheet .hero{position:relative;border-radius:14px;overflow:hidden;border:1px solid rgba(237,168,60,.5);
   background:#0b2a50;margin-bottom:12px}
 .sheet .hero > img{display:block;width:100%;height:auto}
@@ -210,7 +241,10 @@ body{
       <img class="stage-bg" id="stageBg" alt="">
       <div class="stage-floor"></div>
       <div id="chars"></div>
-      <div class="clink" id="clink"></div>
+      <div class="clink" id="clink">
+        <img class="burst light" id="burstLight" alt="">
+        <img class="burst foam" id="burstFoam" alt="">
+      </div>
       <div class="prost-text" id="prostText">PROST！</div>
       <div class="get-banner" id="getBanner"></div>
       <div class="stage-empty" id="stageEmpty">
@@ -259,6 +293,10 @@ body{
     <div class="kicker">CONGRATULATIONS</div>
     <h2>6 BREWERIES COMPLETE</h2>
     <div class="prost">PROST！</div>
+    <div class="medal" id="medal">
+      <img class="medal-ring" id="medalRing" alt="">
+      <div class="medal-in"><b>6</b><span>BREWERIES</span></div>
+    </div>
     <div class="hero" id="completeHero"></div>
     <div style="font-size:13.5px;font-weight:800;margin-bottom:2px">乾杯の輪、完成！</div>
     <div class="title-badge">TOYOSU BEER MASTER</div>
@@ -288,6 +326,11 @@ const CONFIG = {
   ASSETS: {
     stageBg: "./stage-bg.webp",          // ビアテント会場の背景（無ければCSSにフォールバック）
     completeHero: "./complete-hero.webp",// コンプリート画面のメインビジュアル
+    // 装飾パーツ（読み込めない場合はCSSの演出だけで成立する）
+    foamBurst: "./foam-burst.webp",      // 乾杯した瞬間の泡
+    lightBurst: "./light-burst.webp",    // 乾杯した瞬間の光
+    badgeRing: "./badge-ring.webp",      // コンプリート画面のメダル外枠
+    confetti: "./confetti.webp",         // 予備（現在はcanvasの紙吹雪を使用）
     // 乾杯キャラ（透過PNG）。無い場合は自動でプレースホルダーSVGを表示
     characters: [
       "./char1.webp","./char2.webp","./char3.webp",
@@ -717,6 +760,27 @@ $("shareBtn").addEventListener("click", async () => {
   bg.onerror = () => { bg.style.display = "none"; };
   bg.onload  = () => { $("stageFallback").style.opacity = ".25"; };
   bg.src = CONFIG.ASSETS.stageBg;
+})();
+
+// 装飾パーツは読めたものだけ使う。失敗してもCSSの演出だけで成立する
+(function preloadParts(){
+  const pairs = [
+    [$("burstLight"), CONFIG.ASSETS.lightBurst],
+    [$("burstFoam"),  CONFIG.ASSETS.foamBurst]
+  ];
+  let ok = 0;
+  pairs.forEach(([el, src]) => {
+    if (!el || !src) return;
+    el.onload  = () => { el.classList.add("ready"); if (++ok === pairs.length) $("clink").classList.add("has-img"); };
+    el.onerror = () => { el.remove(); };
+    el.src = src;
+  });
+  const ring = $("medalRing");
+  if (ring && CONFIG.ASSETS.badgeRing){
+    ring.onload  = () => { ring.classList.add("ready"); $("medal").classList.add("has-ring"); };
+    ring.onerror = () => { ring.remove(); };
+    ring.src = CONFIG.ASSETS.badgeRing;
+  }
 })();
 
 async function startApp(){
