@@ -12,7 +12,7 @@
   --sky:#5b9ede; --cream:#FFF8EC; --gold:#EDA83C; --gold-l:#FFD07A; --amber:#C8761B;
   --wood:#5A3A22; --wood-d:#3A2415; --ink:#20140a;
   --ok:#3FA96B; --shadow:0 8px 24px rgba(0,0,0,.45);
-  --stage-h:clamp(260px,78vw,340px);
+  --stage-h:clamp(290px,88vw,380px);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
@@ -35,6 +35,14 @@ body{
 .header::before{content:"";position:absolute;inset:0;opacity:.14;
   background-image:repeating-linear-gradient(135deg,#fff 0 14px,transparent 14px 28px);
   pointer-events:none}
+/* ③ ロゴ帯。読み込めなかった画像は自動で消え、残った方だけが中央に並ぶ */
+.logos{position:relative;display:flex;align-items:center;justify-content:center;gap:12px;
+  margin:0 0 14px;min-height:38px}
+.logos img{display:block;height:38px;width:auto;object-fit:contain;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,.35))}
+.logos .logo-20{height:42px}
+.logos .logo-sep{width:1px;height:26px;background:rgba(255,248,236,.35);flex:0 0 auto}
+.logos.one .logo-sep{display:none}
 .header h1{position:relative;margin:0;font-size:clamp(21px,6.4vw,27px);font-weight:900;letter-spacing:.06em;
   color:var(--gold-l);text-shadow:0 2px 0 rgba(0,0,0,.45),0 0 18px rgba(237,168,60,.35)}
 .header .jp{position:relative;margin:6px 0 0;font-size:12.5px;line-height:1.5;opacity:.95}
@@ -85,7 +93,7 @@ body{
   58%{transform:translate(calc(-50% + var(--lean)),-4px) scale(calc(var(--s)*1.05)) rotate(var(--rot))}
   100%{transform:translate(-50%,0) scale(var(--s)) rotate(0)}}
 /* 乾杯の瞬間。画像が読めない環境ではCSSのグラデーションだけで成立させる */
-.clink{position:absolute;left:50%;top:34%;width:30%;aspect-ratio:1/1;z-index:20;
+.clink{position:absolute;left:50%;top:48%;width:30%;aspect-ratio:1/1;z-index:20;
   transform:translate(-50%,-50%) scale(.4);opacity:0;pointer-events:none;
   background:radial-gradient(circle,rgba(255,255,255,.95) 0%,rgba(255,208,122,.65) 28%,transparent 62%)}
 /* 画像がある場合は親のスケールを止め、泡と光それぞれのモーションに任せる */
@@ -95,7 +103,7 @@ body{
 .burst{position:absolute;left:50%;top:50%;display:none;width:100%;height:auto;
   transform:translate(-50%,-50%);pointer-events:none}
 .burst.ready{display:block}
-.burst.light{width:240%;opacity:0}
+.burst.light{width:210%;opacity:0}
 .burst.foam{width:160%;opacity:0}
 .clink.go .burst.light{animation:burstLight .62s ease-out both}
 .clink.go .burst.foam{animation:burstFoam .62s cubic-bezier(.2,.8,.3,1) both}
@@ -223,9 +231,14 @@ body{
 
   <!-- 6. ヘッダー -->
   <header class="header">
+    <div class="logos" id="logos">
+      <img class="logo-20" id="logo20" alt="アーバンドック ららぽーと豊洲 20th anniversary">
+      <span class="logo-sep"></span>
+      <img class="logo-okf" id="logoOkf" alt="OKTOBERFEST since 2003">
+    </div>
     <h1>6 BREWERIES PROST</h1>
     <p class="jp">6つのブランドを巡って<br>乾杯の輪を完成させよう！</p>
-    <span class="venue">OKTOBERFEST 2026 in ららぽーと豊洲</span>
+    <span class="venue">OKTOBERFEST 2026 in アーバンドック ららぽーと豊洲</span>
   </header>
 
   <div id="greet" class="sync">LINE確認中...</div>
@@ -282,7 +295,7 @@ body{
       <li>お酒は20歳になってから。飲酒運転は法律で禁止されています。</li>
     </ul>
   </div>
-  <div class="footer">OKTOBERFEST 2026 in URBAN DOCK LaLaport TOYOSU</div>
+  <div class="footer">OKTOBERFEST 2026 in URBAN DOCK LaLaport TOYOSU / アーバンドック ららぽーと豊洲</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -330,6 +343,8 @@ const CONFIG = {
     foamBurst: "./foam-burst.webp",      // 乾杯した瞬間の泡
     lightBurst: "./light-burst.webp",    // 乾杯した瞬間の光
     badgeRing: "./badge-ring.webp",      // コンプリート画面のメダル外枠
+    logo20th: "./logo-20th.webp",        // アーバンドック ららぽーと豊洲 20周年ロゴ
+    logoOkf: "./logo-okf.webp",          // オクトーバーフェスト ロゴ
     confetti: "./confetti.webp",         // 予備（現在はcanvasの紙吹雪を使用）
     // 乾杯キャラ（透過PNG）。無い場合は自動でプレースホルダーSVGを表示
     characters: [
@@ -338,27 +353,29 @@ const CONFIG = {
     ]
   },
 
-  // 3. 対象6ブランド（spot番号は既存QRと一致させるため変更しないこと）
+  // 3. 対象6ブランド。配列の順がそのまま表示順とBOOTH番号になる。
+  //    spot番号はQRの中身（?spot=N）と一対一なので、ここを変えたらQRも作り直すこと。
   BREWERIES: [
-    { id:"paulaner",   spot:1, name:"パウラーナー",     en:"Paulaner",       logo:"./logo1.jpg.jpg" },
-    { id:"hacker",     spot:2, name:"ハッカープショール", en:"Hacker-Pschorr", logo:"./logo2.jpg.jpg" },
-    { id:"hofbrau",    spot:3, name:"ホフブロイ",       en:"Hofbräu",        logo:"./logo3.png.png" },
-    { id:"karmeliten", spot:4, name:"カーメリテン",     en:"Karmeliten",     logo:"./logo4.png.png" },
-    { id:"arcobrau",   spot:5, name:"アルコブロイ",     en:"Arcobräu",       logo:"./logo5.jpg.jpg" },
-    { id:"hirschbrau", spot:6, name:"ヒルシュブロイ",   en:"Der Hirschbräu", logo:"./logo6.png.png" }
+    { id:"arcobrau",   spot:1, name:"アルコブロイ",       en:"Arcobräu",       logo:"./logo5.jpg.jpg" },
+    { id:"paulaner",   spot:2, name:"パウラーナー",       en:"Paulaner",       logo:"./logo1.jpg.jpg" },
+    { id:"hofbrau",    spot:3, name:"ホフブロイ",         en:"Hofbräu",        logo:"./logo3.png.png" },
+    { id:"hacker",     spot:4, name:"ハッカー・プショール", en:"Hacker-Pschorr", logo:"./logo2.jpg.jpg" },
+    { id:"hirschbrau", spot:5, name:"ヒルシュブロイ",     en:"Der Hirschbräu", logo:"./logo6.png.png" },
+    { id:"karmeliten", spot:6, name:"カーメリテン",       en:"Karmeliten",     logo:"./logo4.png.png" }
   ],
 
   // 10. 人数ごとの配置（x:左からの%、y:床からの%、s:奥行きスケール、w:幅%）
   //     キャラの識別は配列順で固定、配置だけ人数で切り替える
+  //     y は床からの%。手前に立つ人ほど y が小さく s が大きい（奥行きの遠近）
   LAYOUT: {
-    1: [{x:50,y:2,s:1.00}],
-    2: [{x:31,y:2,s:1.00},{x:69,y:2,s:1.00}],
-    3: [{x:50,y:24,s:.84},{x:26,y:1,s:1.00},{x:74,y:1,s:1.00}],
-    4: [{x:34,y:26,s:.82},{x:66,y:26,s:.82},{x:20,y:0,s:1.00},{x:80,y:0,s:1.00}],
-    5: [{x:50,y:32,s:.74},{x:27,y:22,s:.84},{x:73,y:22,s:.84},{x:15,y:0,s:1.00},{x:85,y:0,s:1.00}],
-    6: [{x:35,y:33,s:.72},{x:65,y:33,s:.72},{x:18,y:21,s:.84},{x:82,y:21,s:.84},{x:33,y:0,s:1.00},{x:67,y:0,s:1.00}]
+    1: [{x:50,y:4,s:1.00}],
+    2: [{x:33,y:4,s:1.00},{x:67,y:4,s:1.00}],
+    3: [{x:50,y:22,s:.80},{x:29,y:3,s:1.00},{x:71,y:3,s:1.00}],
+    4: [{x:36,y:22,s:.80},{x:64,y:22,s:.80},{x:24,y:2,s:1.00},{x:76,y:2,s:1.00}],
+    5: [{x:50,y:30,s:.70},{x:30,y:20,s:.82},{x:70,y:20,s:.82},{x:19,y:2,s:1.00},{x:81,y:2,s:1.00}],
+    6: [{x:38,y:30,s:.70},{x:62,y:30,s:.70},{x:22,y:19,s:.82},{x:78,y:19,s:.82},{x:34,y:1,s:1.00},{x:66,y:1,s:1.00}]
   },
-  CHAR_WIDTH: 30,   // キャラ1人の幅（ステージ幅に対する%）
+  CHAR_WIDTH: 20,   // キャラ1人の幅（ステージ幅に対する%）。会場の奥行きに合う等身にする
 
   // 16. 進捗コピー
   COPY: [
@@ -719,7 +736,7 @@ async function buildShareImage(){
   ctx.fillText(CONFIG.TITLE, W/2, 540);
   ctx.fillStyle = "#FFF8EC";
   ctx.font = "600 30px sans-serif";
-  ctx.fillText("OKTOBERFEST 2026 in ららぽーと豊洲", W/2, 1000);
+  ctx.fillText("OKTOBERFEST 2026 in アーバンドック ららぽーと豊洲", W/2, 1000);
   // キャラを横一列に
   const imgs = await Promise.all(CONFIG.ASSETS.characters.map((src,i) => new Promise(res => {
     const im = new Image();
@@ -762,6 +779,20 @@ $("shareBtn").addEventListener("click", async () => {
   bg.src = CONFIG.ASSETS.stageBg;
 })();
 
+// ロゴは読めたものだけ表示する
+(function preloadLogos(){
+  const wrap = $("logos");
+  const pairs = [[$("logo20"), CONFIG.ASSETS.logo20th], [$("logoOkf"), CONFIG.ASSETS.logoOkf]];
+  let shown = 0;
+  pairs.forEach(([el, src]) => {
+    if (!el) return;
+    if (!src) { el.remove(); return; }
+    el.onload  = () => { shown++; };
+    el.onerror = () => { el.remove(); if (shown < 2) wrap.classList.add("one"); };
+    el.src = src;
+  });
+})();
+
 // 装飾パーツは読めたものだけ使う。失敗してもCSSの演出だけで成立する
 (function preloadParts(){
   const pairs = [
@@ -800,14 +831,15 @@ async function startApp(){
       (state.stamps.length > 0 ? " さん、前回の続きからPROST！🍻" : " さん、PROST！🍻");
 
     // 18. 次回来場対応：サーバー側の進捗を取り込む
-    const remote = await Store.call("get", {});
-    if (remote && Store.merge(remote)){
-      render();
-      if (state.stamps.length > 0) $("greet").textContent = profile.displayName + " さん、前回の続きからPROST！🍻";
-    }
-    // ?spot= での新規取得時は「続きから」ではなく通常あいさつに戻す
-    if (new URLSearchParams(location.search).get("spot")) {
-      $("greet").textContent = profile.displayName + " さん、PROST！🍻";
+    // ?spot= がある場合はここで待たない。GASの応答を待つとQRを読んでから
+    // スタンプが出るまで数秒かかってしまうため、取得を先に通す。
+    // （進捗の突き合わせは getStamp 内の Store.sync が同じ和集合で行う）
+    if (!new URLSearchParams(location.search).get("spot")) {
+      const remote = await Store.call("get", {});
+      if (remote && Store.merge(remote)){
+        render();
+        if (state.stamps.length > 0) $("greet").textContent = profile.displayName + " さん、前回の続きからPROST！🍻";
+      }
     }
 
     const scanBtn = $("scanBtn");
