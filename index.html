@@ -165,6 +165,14 @@ body{
 .btn:active{transform:translateY(3px);box-shadow:0 3px 0 #A35F12,0 6px 12px rgba(0,0,0,.4)}
 .btn.ghost{background:transparent;color:var(--cream);border:2px solid rgba(255,248,236,.4);box-shadow:none;font-size:14px;padding:13px}
 .btn.ghost:active{transform:translateY(1px)}
+.btn.small{margin-top:10px;padding:12px;font-size:14px;border-radius:11px;
+  box-shadow:0 4px 0 #A35F12,0 7px 14px rgba(0,0,0,.35)}
+.btn.small:active{transform:translateY(2px);box-shadow:0 2px 0 #A35F12,0 4px 9px rgba(0,0,0,.3)}
+.btn.warn{background:linear-gradient(to bottom,#E86A4A,#C2452A);color:#fff;
+  box-shadow:0 5px 0 #8C2C18,0 9px 18px rgba(0,0,0,.4)}
+.btn.warn:active{box-shadow:0 2px 0 #8C2C18,0 5px 10px rgba(0,0,0,.35)}
+.btn[disabled]{background:linear-gradient(to bottom,#7d8794,#5c646f);color:rgba(255,255,255,.75);
+  box-shadow:0 4px 0 #3d434b;pointer-events:none}
 .scan-hint{margin:16px 2px 0;font-size:12px;line-height:1.7;text-align:center;opacity:.72}
 .toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
   z-index:60;max-width:calc(100% - 36px);padding:13px 20px;border-radius:12px;opacity:0;pointer-events:none;
@@ -242,6 +250,75 @@ body{
 @keyframes logoPop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
 .logo-row img{position:absolute;left:15%;top:15%;width:70%;height:70%;object-fit:contain}
 .sheet .stamp-date{font-size:11px;opacity:.8;margin-bottom:12px}
+
+/* ---------- 特典（記念壁紙・20thジョッキ） ---------- */
+.reward{display:flex;gap:12px;align-items:stretch;text-align:left;margin:10px 0 0;
+  padding:11px;border-radius:14px;border:1px solid rgba(237,168,60,.45);
+  background:linear-gradient(to bottom,rgba(255,248,236,.10),rgba(0,0,0,.20))}
+.reward-thumb{flex:0 0 70px;width:70px;border-radius:10px;overflow:hidden;
+  background:#0b2a50;border:1px solid rgba(237,168,60,.4);
+  display:flex;align-items:center;justify-content:center}
+.reward-thumb.light{background:#fff}
+.reward-thumb img{display:block;width:100%;height:auto}
+.reward-thumb.light img{width:92%}
+.reward-body{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
+.reward-body b{display:block;font-size:12.5px;line-height:1.45;letter-spacing:-.01em;color:var(--gold-l)}
+.reward-body p{margin:3px 0 0;font-size:11px;line-height:1.6;opacity:.85}
+.reward.used{border-color:rgba(255,248,236,.22);opacity:.9}
+.reward-done{display:none;margin-top:9px;padding:8px 10px;border-radius:9px;text-align:center;
+  font-size:12px;font-weight:800;color:#0b2a50;background:linear-gradient(to bottom,#d8dee6,#aab3bf)}
+.reward.used .reward-done{display:block}
+.reward.used .btn{display:none}
+/* 320pxの端末では見出しが3行になってしまうので少し詰める */
+@media (max-width:360px){
+  .reward{gap:9px;padding:9px}
+  .reward-thumb{flex:0 0 58px;width:58px}
+  .reward-body b{font-size:11.5px}
+  .reward-body p{font-size:10.5px}
+}
+
+/* ---------- 壁紙プレビュー ---------- */
+.wp-sheet{max-width:360px}
+.wp-full{display:block;width:100%;height:auto;margin:10px 0 0;border-radius:12px;
+  border:1px solid rgba(237,168,60,.5);background:#0b2a50}
+.wp-hint{margin:10px 2px 0;font-size:11.5px;line-height:1.7;opacity:.85}
+
+/* ---------- 引換券 ---------- */
+.rd-title{margin:8px 0 2px;font-size:17px;font-weight:900;color:var(--gold-l);line-height:1.4}
+.rd-mug{width:104px;margin:8px auto 0;padding:7px;border-radius:12px;
+  background:#fff;border:1px solid rgba(237,168,60,.55)}
+.rd-mug img{display:block;width:100%;height:auto}
+.rd-code{margin:12px 0 0;font-size:11px;letter-spacing:.14em;opacity:.8}
+.rd-code b{display:block;margin-top:3px;font-size:27px;letter-spacing:.14em;color:var(--gold-l);
+  font-variant-numeric:tabular-nums}
+.rd-clock{margin-top:8px;font-size:30px;font-weight:900;line-height:1;color:#fff;
+  font-variant-numeric:tabular-nums;text-shadow:0 2px 0 var(--amber)}
+.rd-live{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;
+  font-size:10.5px;opacity:.7}
+.rd-live .dot{width:7px;height:7px;border-radius:50%;background:#3FA96B;
+  animation:livePulse 1s ease-in-out infinite}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+.rd-logos{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;margin:13px 4px 0}
+.rd-logos div{position:relative;width:100%;height:0;padding-top:calc(100% - 2px);
+  overflow:hidden;border-radius:50%;border:1px solid rgba(237,168,60,.6);
+  background:linear-gradient(to bottom,#FFFDF7,#EFE6D4)}
+.rd-logos img{position:absolute;left:14%;top:14%;width:72%;height:72%;object-fit:contain}
+.rd-note{margin:12px 2px 0;font-size:11.5px;line-height:1.7;opacity:.85}
+.rd-staff{margin-top:15px;padding:12px 11px 13px;border-radius:12px;
+  border:1px dashed rgba(255,248,236,.35);background:rgba(0,0,0,.22)}
+.rd-staff-label{font-size:10px;font-weight:800;letter-spacing:.18em;opacity:.6}
+.rd-staff .btn{margin-top:10px}
+.rd-confirm{display:none;margin-top:10px}
+.rd-confirm p{margin:0;font-size:11.5px;line-height:1.65;opacity:.9}
+.rd-staff.asking .rd-confirm{display:block}
+.rd-staff.asking > .btn{display:none}
+.rd-done-box{display:none;margin-top:14px;padding:13px;border-radius:12px;
+  color:#0b2a50;background:linear-gradient(to bottom,#e6ebf1,#b9c2cd)}
+.rd-done-box b{display:block;font-size:16px;font-weight:900}
+.rd-done-box span{display:block;margin-top:3px;font-size:11.5px;opacity:.8}
+.redeem-sheet.used .rd-staff{display:none}
+.redeem-sheet.used .rd-done-box{display:block}
+.redeem-sheet.used .rd-clock,.redeem-sheet.used .rd-live{display:none}
 </style>
 </head>
 <body>
@@ -335,8 +412,68 @@ body{
     <div class="brands-label">6 BREWERIES YOU VISITED</div>
     <div class="logo-row" id="completeLogos"></div>
     <div class="stamp-date" id="completeDate"></div>
+
+    <div class="brands-label">YOUR REWARDS</div>
+
+    <div class="reward" id="wpCard">
+      <div class="reward-thumb"><img id="wpThumb" alt="記念壁紙"></div>
+      <div class="reward-body">
+        <b>コンプリート記念の壁紙</b>
+        <p>6ブランド制覇した方だけの壁紙です。スマホの待ち受けにどうぞ。</p>
+        <button class="btn small" id="wpBtn">壁紙を受け取る</button>
+      </div>
+    </div>
+
+    <div class="reward" id="prizeCard">
+      <div class="reward-thumb light"><img id="prizeImg" alt=""></div>
+      <div class="reward-body">
+        <b id="prizeTitle">オリジナル20thジョッキプレゼント！</b>
+        <p id="prizeNote">会場内インフォメーションで引換です。</p>
+        <button class="btn small" id="redeemBtn">引き換える</button>
+        <div class="reward-done" id="prizeDone">引換済み</div>
+      </div>
+    </div>
+
     <button class="btn" id="shareBtn">📣 記念画像をシェアする</button>
     <button class="btn ghost" id="closeComplete">閉じる</button>
+  </div>
+</div>
+
+<!-- 壁紙プレビュー -->
+<div class="modal" id="wpModal">
+  <div class="sheet wp-sheet">
+    <div class="kicker">SPECIAL WALLPAPER</div>
+    <img class="wp-full" id="wpFull" alt="記念壁紙">
+    <div class="wp-hint" id="wpHint">画像を長押しして「”写真”に追加」を選ぶと保存できます。</div>
+    <button class="btn" id="wpSave">画像を保存する</button>
+    <button class="btn ghost" id="wpClose">閉じる</button>
+  </div>
+</div>
+
+<!-- 20thジョッキ引換券 -->
+<div class="modal" id="redeemModal">
+  <div class="sheet redeem-sheet" id="redeemSheet">
+    <div class="kicker">この画面をスタッフにお見せください</div>
+    <div class="rd-title" id="rdTitle">オリジナル20thジョッキ 引換券</div>
+    <div class="rd-mug"><img id="rdMug" alt=""></div>
+    <div class="rd-code">引換番号<b id="rdCode">------</b></div>
+    <div class="rd-clock" id="rdClock">--:--:--</div>
+    <div class="rd-live"><span class="dot"></span>時刻が動いていることをご確認ください</div>
+    <div class="rd-logos" id="rdLogos"></div>
+    <div class="rd-note" id="rdPlace">引換場所：会場内インフォメーション</div>
+
+    <div class="rd-staff" id="rdStaff">
+      <div class="rd-staff-label">STAFF 操作</div>
+      <button class="btn warn" id="rdDone">引換済みにする</button>
+      <div class="rd-confirm">
+        <p>引換済みにすると元に戻せません。お渡し後に押してください。</p>
+        <button class="btn warn" id="rdDoneYes">はい、引換済みにする</button>
+        <button class="btn ghost small" id="rdDoneNo">戻る</button>
+      </div>
+    </div>
+
+    <div class="rd-done-box"><b>引換済み</b><span id="rdDoneAt"></span></div>
+    <button class="btn ghost" id="rdClose">閉じる</button>
   </div>
 </div>
 
@@ -368,6 +505,16 @@ const CONFIG = {
     logo20th: "./logo-20th.webp",        // アーバンドック ららぽーと豊洲 20周年ロゴ
     logoOkf: "./logo-okf.webp",          // オクトーバーフェスト ロゴ
     confetti: "./confetti.webp",         // 予備（現在はcanvasの紙吹雪を使用）
+  },
+
+  // 17-2. コンプリート特典
+  REWARD: {
+    wallpaper:      "./wallpaper.jpg",        // 保存用の壁紙（全端末で保存できるJPEG）
+    wallpaperThumb: "./wallpaper-thumb.webp", // カードに出す軽量サムネ
+    wallpaperFile:  "oktoberfest2026-toyosu-wallpaper.jpg",
+    prizeImage: "./prize-mug.webp",
+    prizeName:  "オリジナル20thジョッキ",
+    prizePlace: "会場内インフォメーション"
   },
 
   // 3. 対象6ブランド。配列の順がそのまま表示順とBOOTH番号になる。
@@ -422,6 +569,7 @@ const state = {
   stamps: [],            // 取得済みspot番号の配列
   acquiredAt: {},        // { spot: ISO文字列 }
   completedAt: null,
+  redeemedAt: null,      // 20thジョッキを引き換えた日時（ISO文字列）
   userId: null,
   displayName: "",
   idToken: null,
@@ -442,13 +590,15 @@ const Store = {
       const meta = JSON.parse(localStorage.getItem(CONFIG.META_KEY)) || {};
       state.acquiredAt = meta.acquiredAt || {};
       state.completedAt = meta.completedAt || null;
+      state.redeemedAt = meta.redeemedAt || null;
     } catch(e){ state.stamps = []; }
   },
   saveLocal(){
     try {
       localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(state.stamps));
       localStorage.setItem(CONFIG.META_KEY, JSON.stringify({
-        acquiredAt: state.acquiredAt, completedAt: state.completedAt
+        acquiredAt: state.acquiredAt, completedAt: state.completedAt,
+        redeemedAt: state.redeemedAt
       }));
     } catch(e){}
   },
@@ -477,11 +627,14 @@ const Store = {
     state.stamps = [...set].filter(n => n >= 1 && n <= 6).sort((a,b)=>a-b);
     Object.assign(state.acquiredAt, remote.acquiredAt || {});
     if (remote.completedAt && !state.completedAt) state.completedAt = remote.completedAt;
+    // 引換済みは「どちらかで引換済みなら引換済み」で寄せる（別端末での二重引換を防ぐ）
+    if (remote.redeemedAt && !state.redeemedAt) state.redeemedAt = remote.redeemedAt;
     this.saveLocal();
     return state.stamps.length !== before;
   },
   async sync(){
-    const r = await this.call("sync", { stamps: state.stamps, acquiredAt: state.acquiredAt, completedAt: state.completedAt });
+    const r = await this.call("sync", { stamps: state.stamps, acquiredAt: state.acquiredAt,
+                                        completedAt: state.completedAt, redeemedAt: state.redeemedAt });
     if (r) {
       const changed = this.merge(r);
       $("syncState").textContent = "進捗を保存しました";
@@ -712,6 +865,7 @@ function openComplete(){
   $("completeDate").textContent = "COMPLETE：" +
     d.getFullYear() + "年" + (d.getMonth()+1) + "月" + d.getDate() + "日 " +
     String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
+  renderRewards();
   $("completeModal").classList.add("open");
   confetti();
 }
@@ -785,6 +939,157 @@ async function buildShareImage(){
   });
   return new Promise(res => cv.toBlob(res, "image/png"));
 }
+
+/* ---------------------------------------------------------------
+   17-2. コンプリート特典
+   ① 記念壁紙のプレゼント
+   ② オリジナル20thジョッキの引換券（インフォメーションで引換）
+   引換はスタッフが2段階で確定させ、端末とGASの両方に記録する。
+   --------------------------------------------------------------- */
+const fmtDateTime = (v) => {
+  const d = new Date(v || Date.now());
+  return d.getFullYear() + "年" + (d.getMonth()+1) + "月" + d.getDate() + "日 " +
+    String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
+};
+
+// 引換番号。同じ人なら毎回同じ番号になるので、スタッフの控えと突き合わせられる
+function redeemCode(){
+  const seed = (state.userId || "guest") + "|" + (state.completedAt || "");
+  let h1 = 0x811c9dc5, h2 = 0x01000193;
+  for (let i = 0; i < seed.length; i++){
+    h1 = (h1 ^ seed.charCodeAt(i)) * 16777619 >>> 0;
+    h2 = (h2 + seed.charCodeAt(i) * (i + 7)) >>> 0;
+  }
+  const A = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";   // 紛らわしいI/O/0/1は除く
+  let out = "", n = h1;
+  for (let i = 0; i < 3; i++){ out += A[n % A.length]; n = Math.floor(n / A.length); }
+  out += "-";
+  n = h2;
+  for (let i = 0; i < 3; i++){ out += A[n % A.length]; n = Math.floor(n / A.length); }
+  return out;
+}
+
+function renderRewards(){
+  const R = CONFIG.REWARD;
+  const thumb = $("wpThumb");
+  if (thumb && !thumb.src){
+    thumb.onerror = () => { $("wpCard").querySelector(".reward-thumb").remove(); };
+    thumb.src = R.wallpaperThumb;
+  }
+  const mug = $("prizeImg");
+  if (mug && !mug.src){
+    mug.alt = R.prizeName;
+    mug.onerror = () => { $("prizeCard").querySelector(".reward-thumb").remove(); };
+    mug.src = R.prizeImage;
+  }
+  // 「プレゼント！」は必ず改行して、末尾1文字だけが落ちるのを防ぐ
+  const pt = $("prizeTitle");
+  pt.textContent = R.prizeName;
+  pt.appendChild(document.createElement("br"));
+  pt.appendChild(document.createTextNode("プレゼント！"));
+  $("prizeNote").textContent  = R.prizePlace + "で引換です。";
+  syncRedeemView();
+}
+
+function syncRedeemView(){
+  const done = !!state.redeemedAt;
+  $("prizeCard").classList.toggle("used", done);
+  $("redeemSheet").classList.toggle("used", done);
+  if (done){
+    $("prizeDone").textContent = "引換済み（" + fmtDateTime(state.redeemedAt) + "）";
+    $("rdDoneAt").textContent = fmtDateTime(state.redeemedAt);
+  }
+  $("rdStaff").classList.remove("asking");
+}
+
+/* --- 壁紙 --- */
+let wpLoaded = false;
+$("wpBtn").addEventListener("click", () => {
+  if (!wpLoaded){
+    const full = $("wpFull");
+    full.onerror = () => { full.remove(); $("wpHint").textContent = "壁紙を読み込めませんでした。通信状況の良い場所でお試しください。"; };
+    full.src = CONFIG.REWARD.wallpaper;
+    wpLoaded = true;
+  }
+  $("wpModal").classList.add("open");
+});
+$("wpClose").addEventListener("click", () => $("wpModal").classList.remove("open"));
+
+$("wpSave").addEventListener("click", async () => {
+  const R = CONFIG.REWARD;
+  try {
+    const res = await fetch(R.wallpaper, { cache: "force-cache" });
+    const blob = await res.blob();
+    const file = new File([blob], R.wallpaperFile, { type: "image/jpeg" });
+    if (navigator.canShare && navigator.canShare({ files:[file] })){
+      await navigator.share({ files:[file] });
+      return;
+    }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = R.wallpaperFile;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    toast("壁紙を保存しました！");
+  } catch(e){
+    if (e && e.name === "AbortError") return;   // 共有シートを閉じただけ
+    toast("保存できませんでした。<br><small>画像を長押しして保存してください</small>");
+  }
+});
+
+/* --- 20thジョッキの引換券 --- */
+let rdTimer = null;
+function startClock(){
+  const el = $("rdClock");
+  const tick = () => {
+    const d = new Date();
+    el.textContent = [d.getHours(), d.getMinutes(), d.getSeconds()]
+      .map(n => String(n).padStart(2,"0")).join(":");
+  };
+  tick();
+  clearInterval(rdTimer);
+  rdTimer = setInterval(tick, 1000);
+}
+
+$("redeemBtn").addEventListener("click", () => {
+  $("rdTitle").textContent = CONFIG.REWARD.prizeName + " 引換券";
+  $("rdPlace").textContent = "引換場所：" + CONFIG.REWARD.prizePlace;
+  const mug = $("rdMug");
+  if (!mug.src){ mug.onerror = () => mug.closest(".rd-mug").remove(); mug.src = CONFIG.REWARD.prizeImage; }
+  $("rdCode").textContent = redeemCode();
+  $("rdLogos").innerHTML = CONFIG.BREWERIES
+    .map(b => '<div><img src="' + b.logo + '" alt="' + b.en + '"></div>').join("");
+  syncRedeemView();
+  startClock();
+  $("redeemModal").classList.add("open");
+});
+
+$("rdClose").addEventListener("click", () => {
+  $("redeemModal").classList.remove("open");
+  clearInterval(rdTimer); rdTimer = null;
+});
+$("rdDone").addEventListener("click", () => $("rdStaff").classList.add("asking"));
+$("rdDoneNo").addEventListener("click", () => $("rdStaff").classList.remove("asking"));
+
+$("rdDoneYes").addEventListener("click", async () => {
+  if (state.redeemedAt) return;
+  const btn = $("rdDoneYes");
+  btn.disabled = true;
+  state.redeemedAt = new Date().toISOString();
+  Store.saveLocal();
+  syncRedeemView();
+  clearInterval(rdTimer); rdTimer = null;
+  const r = await Store.call("redeem", { redeemedAt: state.redeemedAt });
+  if (r && r.redeemedAt && r.redeemedAt !== state.redeemedAt){
+    // すでに別端末で引換済みだった場合はサーバー側の日時に合わせる
+    state.redeemedAt = r.redeemedAt;
+    Store.saveLocal();
+    syncRedeemView();
+  }
+  $("syncState").textContent = r ? "引換を記録しました" : "引換をこの端末に記録しました";
+  btn.disabled = false;
+  toast("引換済みにしました。ありがとうございました！");
+});
 
 $("shareBtn").addEventListener("click", async () => {
   try {
