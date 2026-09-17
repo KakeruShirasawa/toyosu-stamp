@@ -113,15 +113,15 @@ body{
 @keyframes burstFoam{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}
   34%{opacity:1;transform:translate(-50%,-50%) scale(1.02)}
   100%{opacity:0;transform:translate(-50%,-50%) scale(1.28)}}
-.prost-text{position:absolute;left:0;right:0;top:26%;text-align:center;opacity:0;pointer-events:none;
+.prost-text{position:absolute;left:0;right:0;top:26%;z-index:26;text-align:center;opacity:0;pointer-events:none;
   font-size:clamp(34px,11vw,48px);font-weight:900;font-style:italic;letter-spacing:.04em;color:var(--gold-l);
   text-shadow:0 3px 0 var(--amber),0 0 24px rgba(255,208,122,.7),0 6px 18px rgba(0,0,0,.6)}
 .prost-text.go{animation:prostIn 1.5s ease-out both}
 @keyframes prostIn{0%{opacity:0;transform:scale(.8)}22%{opacity:1;transform:scale(1.1)}38%{transform:scale(1)}78%{opacity:1}100%{opacity:0}}
-.stage-empty{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);padding:0 22px;text-align:center;
+.stage-empty{position:absolute;left:0;right:0;top:50%;z-index:24;transform:translateY(-50%);padding:0 22px;text-align:center;
   font-size:14.5px;font-weight:800;line-height:1.7;text-shadow:0 2px 6px rgba(0,0,0,.7)}
 .stage-empty small{display:block;margin-top:8px;font-size:11.5px;font-weight:500;opacity:.85}
-.get-banner{position:absolute;left:50%;bottom:12px;transform:translateX(-50%) translateY(14px);opacity:0;
+.get-banner{position:absolute;left:50%;bottom:12px;z-index:28;transform:translateX(-50%) translateY(14px);opacity:0;
   padding:8px 18px;border-radius:999px;white-space:nowrap;pointer-events:none;
   background:linear-gradient(to bottom,#EDA83C,#C8761B);color:#20140a;
   font-size:14px;font-weight:900;letter-spacing:.04em;box-shadow:0 6px 16px rgba(0,0,0,.5)}
@@ -188,6 +188,36 @@ body{
 .notes ul{margin:0;padding-left:1.1em}
 .footer{margin-top:16px;text-align:center;font-size:9.5px;opacity:.45}
 .sync{margin-top:10px;text-align:center;font-size:10px;opacity:.55;min-height:1.2em}
+
+/* ---------- QRの読み取り案内 ---------- */
+.scan-lead{margin-top:16px;padding:14px 15px;border-radius:14px;text-align:center;
+  background:rgba(7,29,56,.55);border:1px solid rgba(237,168,60,.45)}
+.scan-lead b{display:block;font-size:13px;font-weight:900;letter-spacing:.06em;color:var(--gold-l)}
+.scan-lead p{margin:7px 0 0;font-size:13px;font-weight:700;line-height:1.75}
+.scan-lead p em{font-style:normal;color:var(--gold-l)}
+.scan-lead small{display:block;margin-top:7px;font-size:11px;font-weight:500;line-height:1.7;opacity:.8}
+
+/* ---------- 取得ポップアップ（人が増える瞬間を見せる） ---------- */
+.get-modal{padding:12px}
+.get-sheet{max-width:430px;padding:16px 14px 16px}
+.get-sheet .get-title{margin:5px 0 0;font-size:18px;font-weight:900;line-height:1.45;color:var(--gold-l);
+  text-shadow:0 2px 0 var(--amber),0 0 18px rgba(255,208,122,.45)}
+#getSlot > .stage-wrap{margin-top:12px}
+#getSlot > .progress{margin-top:12px}
+#getSlot > .progress .note{display:none}
+/* ポップアップは幅が狭いので「1 / 6 BREWERIES」を1行に収める */
+#getSlot > .progress .count{font-size:clamp(20px,6vw,26px);white-space:nowrap}
+#getSlot > .progress .count b{font-size:1.28em}
+
+/* ---------- コンプリート画面のスワイプ案内 ---------- */
+.swipe-hint{position:absolute;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));
+  z-index:5;display:flex;align-items:center;gap:9px;padding:11px 19px;border-radius:999px;white-space:nowrap;
+  pointer-events:none;color:#20140a;background:linear-gradient(to bottom,#FFD07A,#EDA83C);
+  font-size:13px;font-weight:900;letter-spacing:.02em;box-shadow:0 8px 22px rgba(0,0,0,.55);
+  transform:translateX(-50%);transition:opacity .3s ease,transform .3s ease}
+.swipe-hint i{font-style:normal;font-size:16px;animation:swipeArw 1.2s ease-in-out infinite}
+@keyframes swipeArw{0%,100%{transform:translateY(-2px)}50%{transform:translateY(4px)}}
+.swipe-hint.hide{opacity:0;transform:translateX(-50%) translateY(12px)}
 
 /* ---------- 17. コンプリート画面 ---------- */
 .modal{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:18px;
@@ -343,7 +373,7 @@ body{
   <div class="badges" id="badges"></div>
 
   <!-- 8. PROSTステージ -->
-  <div class="stage-wrap">
+  <div class="stage-wrap" id="stageWrap">
     <div class="stage" id="stage">
       <div class="stage-fallback" id="stageFallback"></div>
       <img class="stage-bg" id="stageBg" alt="">
@@ -364,15 +394,21 @@ body{
   </div>
 
   <!-- 4/16. 進捗 -->
-  <div class="progress">
+  <div class="progress" id="progressBox">
     <div class="count" id="count"><b>0</b> / 6 BREWERIES</div>
     <div class="bar" id="bar"></div>
     <div class="copy" id="copy">最初のPROSTを始めよう！</div>
     <div class="note">開催期間中、何度でも続きから楽しめます</div>
   </div>
+  <div id="stageAnchor" hidden></div>
 
-  <button id="scanBtn" class="btn" style="display:none">📷 QRコードを読み取る</button>
-  <p id="scanHint" class="scan-hint" style="display:none">各ブースのQRコードを読み取るとスタンプがたまります</p>
+  <div class="scan-lead">
+    <b>スタンプの押し方</b>
+    <p>各ブースのQRコードを<br><em>スマホのカメラ</em>か<em>LINEのQRリーダー</em>で読み取ってください。</p>
+    <small>読み取るとこの画面が開いて、乾杯の輪に1人加わります。</small>
+  </div>
+  <button id="scanBtn" class="btn ghost" style="display:none">📷 アプリ内カメラで読み取る</button>
+  <p id="scanHint" class="scan-hint" style="display:none">アプリ内カメラはiPhoneの仕様で毎回カメラの許可を聞かれます。<br>スマホのカメラで読み取ると許可は出ません。</p>
   <button id="openComplete" class="btn ghost" style="display:none">🏆 コンプリート画面を見る</button>
 
   <!-- 15. ブランド一覧 -->
@@ -396,8 +432,38 @@ body{
 
 <div class="toast" id="toast"></div>
 
+<!-- 13-2. 取得ポップアップ（ステージと進捗をここへ移して見せる） -->
+<div class="modal get-modal" id="getModal">
+  <div class="sheet get-sheet">
+    <div class="kicker">NEW PROST</div>
+    <div class="get-title" id="getTitle"></div>
+    <div id="getSlot"></div>
+    <button class="btn" id="getNext">つづける</button>
+  </div>
+</div>
+
+<!-- 管理者メニュー（?admin=キー でのみ開く） -->
+<div class="modal" id="adminModal">
+  <div class="sheet wp-sheet">
+    <div class="kicker">ADMIN</div>
+    <div class="rd-title">管理者メニュー</div>
+    <div class="rd-note" id="adminState"></div>
+    <div class="rd-staff" id="adminStaff">
+      <div class="rd-staff-label">テスト用リセット</div>
+      <button class="btn warn" id="admReset">スタンプを全部消す</button>
+      <div class="rd-confirm">
+        <p>この端末とサーバーの記録（スタンプ・コンプリート日時・引換記録）をすべて消します。元に戻せません。</p>
+        <button class="btn warn" id="admResetYes">はい、全部消す</button>
+        <button class="btn ghost small" id="admResetNo">戻る</button>
+      </div>
+    </div>
+    <button class="btn ghost" id="admClose">閉じる</button>
+  </div>
+</div>
+
 <!-- 17. コンプリート画面 -->
 <div class="modal" id="completeModal">
+  <div class="swipe-hint" id="swipeHint"><span>スワイプして景品をGETする</span><i>↓</i></div>
   <div class="sheet">
     <div class="kicker">CONGRATULATIONS</div>
     <h2>6 BREWERIES COMPLETE</h2>
@@ -491,6 +557,11 @@ const CONFIG = {
   GAS_ENDPOINT: "https://script.google.com/macros/s/AKfycbzeFGijUO9bFyNakp1ANWpY-BtP3LmfTevKk4NRnTIS1HaxVGjdRkAiung6oCdRS40PJw/exec",
 
   GAS_TIMEOUT_MS: 8000,   // GAS応答の打ち切り時間
+
+  // 管理者用の隠しコマンド。
+  // https://liff.line.me/2010727861-qqi11OFO?admin=<このキー> を読み取ると管理者メニューが開く。
+  // 印刷用QRは配布資料に入れず、スタッフだけが持つようにしてください。
+  ADMIN_KEY: "tyOKF26-reset-9QzKv4",
 
   STORAGE_KEY: "toyosu_beer_stamps",   // 旧版と同じキー（既存ユーザーの進捗を引き継ぐ）
   META_KEY: "toyosu_prost_meta",
@@ -807,6 +878,9 @@ async function getStamp(spot){
   if (done && !state.completedAt) state.completedAt = new Date().toISOString();
   Store.saveLocal();
 
+  // 13-2. 人が増える瞬間はポップアップでしっかり見せる
+  openGetPopup(brewery, done);
+
   // 新しい仲間が登場 → 全員でPROST
   renderChars(brewery.spot);
   renderProgress();
@@ -819,19 +893,50 @@ async function getStamp(spot){
     bn.classList.remove("go"); void bn.offsetWidth; bn.classList.add("go");
   }, 1500);
 
-  // バッジ獲得演出
-  setTimeout(() => {
-    renderBadges(); renderList();
-    const badge = $("badge-" + brewery.spot);
-    if (badge) badge.classList.add("pop");
-  }, 2200);
-
-  // コンプリート
-  if (done) setTimeout(openComplete, 3200);
+  renderBadges(); renderList();
+  pendingBadgePop = brewery.spot;
 
   setTimeout(() => { state.busy = false; }, 2600);
   Store.sync();
 }
+
+/* ---------------------------------------------------------------
+   13-2. 取得ポップアップ
+   ステージと進捗をポップアップの中へ一時的に移動させて見せる。
+   同じDOMを動かすので、演出・座標計算はすべて既存のものがそのまま使える。
+   --------------------------------------------------------------- */
+let pendingBadgePop = null;
+let getPopupDone = false;
+
+function openGetPopup(brewery, done){
+  const slot = $("getSlot");
+  slot.appendChild($("stageWrap"));
+  slot.appendChild($("progressBox"));
+  $("getTitle").innerHTML = brewery.person + " が<br>乾杯の輪に加わった！";
+  getPopupDone = !!done;
+  $("getNext").textContent = done ? "コンプリート画面へ" : "つづける";
+  $("getModal").classList.add("open");
+}
+
+function closeGetPopup(){
+  $("getModal").classList.remove("open");
+  const app = document.querySelector(".app");
+  const anchor = $("stageAnchor");
+  app.insertBefore($("stageWrap"), anchor);
+  app.insertBefore($("progressBox"), anchor);
+  // バッジの獲得演出はポップアップを閉じてから見せる
+  if (pendingBadgePop !== null){
+    const badge = $("badge-" + pendingBadgePop);
+    if (badge){
+      badge.classList.remove("pop"); void badge.offsetWidth; badge.classList.add("pop");
+      badge.scrollIntoView({ behavior:"smooth", block:"center" });
+    }
+    pendingBadgePop = null;
+  }
+  if (getPopupDone){ getPopupDone = false; setTimeout(openComplete, 450); }
+}
+
+$("getNext").addEventListener("click", closeGetPopup);
 
 /* ---------------------------------------------------------------
    17. コンプリート画面
@@ -866,11 +971,30 @@ function openComplete(){
     d.getFullYear() + "年" + (d.getMonth()+1) + "月" + d.getDate() + "日 " +
     String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
   renderRewards();
-  $("completeModal").classList.add("open");
+  const cm = $("completeModal");
+  cm.classList.add("open");
+  cm.querySelector(".sheet").scrollTop = 0;
+  $("swipeHint").classList.remove("hide");
+  if (cm._swipeHintUpdate) setTimeout(cm._swipeHintUpdate, 60);
   confetti();
 }
 
 $("closeComplete").addEventListener("click", () => $("completeModal").classList.remove("open"));
+
+/* コンプリート画面のスワイプ案内。景品カードが見えたら引っ込める */
+(function setupSwipeHint(){
+  const modal = $("completeModal"), hint = $("swipeHint");
+  const sheet = modal.querySelector(".sheet");
+  const update = () => {
+    const card = $("wpCard");
+    if (!card) return;
+    const seen = card.getBoundingClientRect().top < window.innerHeight * 0.88;
+    hint.classList.toggle("hide", seen);
+  };
+  sheet.addEventListener("scroll", update, { passive:true });
+  window.addEventListener("resize", update);
+  modal._swipeHintUpdate = update;
+})();
 $("openComplete").addEventListener("click", openComplete);
 
 /* 紙吹雪（軽量canvas・2.6秒で自動停止） */
@@ -1108,6 +1232,49 @@ $("shareBtn").addEventListener("click", async () => {
 });
 
 /* ---------------------------------------------------------------
+   管理者用の隠しコマンド
+   ?admin=<CONFIG.ADMIN_KEY> で開く。テスト用にスタンプを全消去する。
+   --------------------------------------------------------------- */
+function openAdmin(){
+  $("adminStaff").classList.remove("asking");
+  $("adminState").innerHTML = "現在の記録：スタンプ " + state.stamps.length + " / 6" +
+    (state.completedAt ? "<br>コンプリート：" + fmtDateTime(state.completedAt) : "") +
+    (state.redeemedAt ? "<br>20thジョッキ：引換済み" : "");
+  $("adminModal").classList.add("open");
+}
+
+async function resetAll(){
+  const btn = $("admResetYes");
+  btn.disabled = true;
+  $("adminState").textContent = "消去中…";
+  const r = await Store.call("reset", {});
+  state.stamps = []; state.acquiredAt = {};
+  state.completedAt = null; state.redeemedAt = null;
+  try {
+    localStorage.removeItem(CONFIG.STORAGE_KEY);
+    localStorage.removeItem(CONFIG.META_KEY);
+  } catch(e){}
+  ["completeModal","getModal","wpModal","redeemModal"].forEach(id => $(id).classList.remove("open"));
+  render();
+  syncRedeemView();
+  $("adminStaff").classList.remove("asking");
+  $("adminState").innerHTML = r
+    ? "この端末とサーバーの記録を消去しました。"
+    : "この端末の記録を消去しました。<br><small>サーバー側は消せませんでした（GASの再デプロイが必要です）</small>";
+  $("syncState").textContent = "";
+  btn.disabled = false;
+}
+
+$("admReset").addEventListener("click", () => $("adminStaff").classList.add("asking"));
+$("admResetNo").addEventListener("click", () => $("adminStaff").classList.remove("asking"));
+$("admResetYes").addEventListener("click", resetAll);
+$("admClose").addEventListener("click", () => {
+  $("adminModal").classList.remove("open");
+  // URLのキーを消しておく（再読み込みで勝手に開かないように）
+  try { history.replaceState(null, "", location.pathname); } catch(e){}
+});
+
+/* ---------------------------------------------------------------
    QR読み取りボタン
    scanCodeV2 はLINEアプリ内でのみ使えるため、外部ブラウザでは
    ボタンを出さずに案内文に切り替える。
@@ -1119,10 +1286,10 @@ function setupScanButton(){
                  typeof liff.isInClient === "function" && liff.isInClient();
   if (!usable){
     btn.style.display = "none";
-    hint.style.display = "block";
+    hint.style.display = "none";   // 読み取り方法は .scan-lead で常に案内している
     return;
   }
-  hint.style.display = "none";
+  hint.style.display = "block";
   btn.style.display = "block";
   if (btn.dataset.bound) return;
   btn.dataset.bound = "1";
@@ -1223,8 +1390,13 @@ async function startApp(){
     $("scanBtn").style.display = "none";
   }
 
+  const q = new URLSearchParams(location.search);
+
+  // 管理者用の隠しコマンド
+  if (q.get("admin") === CONFIG.ADMIN_KEY){ openAdmin(); return; }
+
   // ?spot=N でのスタンプ取得（既存QRと互換）
-  const spot = new URLSearchParams(location.search).get("spot");
+  const spot = q.get("spot");
   if (spot) setTimeout(() => getStamp(spot), 400);
   else if (state.stamps.length > 0) setTimeout(playProst, 600);
 }
