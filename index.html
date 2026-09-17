@@ -165,6 +165,7 @@ body{
 .btn:active{transform:translateY(3px);box-shadow:0 3px 0 #A35F12,0 6px 12px rgba(0,0,0,.4)}
 .btn.ghost{background:transparent;color:var(--cream);border:2px solid rgba(255,248,236,.4);box-shadow:none;font-size:14px;padding:13px}
 .btn.ghost:active{transform:translateY(1px)}
+.scan-hint{margin:16px 2px 0;font-size:12px;line-height:1.7;text-align:center;opacity:.72}
 .toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
   z-index:60;max-width:calc(100% - 36px);padding:13px 20px;border-radius:12px;opacity:0;pointer-events:none;
   font-size:13.5px;font-weight:800;text-align:center;line-height:1.5;
@@ -203,14 +204,15 @@ body{
 @keyframes medalIn{0%{opacity:0;transform:scale(.6) rotate(-8deg)}100%{opacity:1;transform:none}}
 .medal-ring{position:absolute;left:50%;top:50%;width:100%;height:auto;transform:translate(-50%,-50%);display:none}
 .medal-ring.ready{display:block}
-.medal-in{position:relative;top:-6%;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  width:52%;aspect-ratio:1/1;border-radius:50%;
+/* リング画像の開口部は中心よりやや上にあるため、そこへ文字を合わせる */
+.medal-in{position:relative;top:-9%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:43%;aspect-ratio:1/1;border-radius:50%;
   background:radial-gradient(circle,rgba(237,168,60,.22),rgba(7,29,56,.55));
   border:2px solid var(--gold);transition:border-color .3s,background .3s}
 .medal.has-ring .medal-in{border:0;background:none}
-.medal-in b{font-size:clamp(30px,10vw,44px);font-weight:900;line-height:1;color:var(--gold-l);
+.medal-in b{font-size:clamp(26px,8.4vw,38px);font-weight:900;line-height:1;color:var(--gold-l);
   text-shadow:0 2px 0 var(--amber),0 0 14px rgba(255,208,122,.6)}
-.medal-in span{margin-top:2px;font-size:8.5px;font-weight:800;letter-spacing:.14em;opacity:.9}
+.medal-in span{margin-top:1px;font-size:7.5px;font-weight:800;letter-spacing:.08em;opacity:.9;white-space:nowrap}
 .sheet .hero{position:relative;border-radius:14px;overflow:hidden;border:1px solid rgba(237,168,60,.5);
   background:#0b2a50;margin-bottom:12px}
 .sheet .hero > img{display:block;width:100%;height:auto}
@@ -219,9 +221,25 @@ body{
 .title-badge{display:inline-block;margin:4px 0 10px;padding:9px 20px;border-radius:999px;
   font-size:14px;font-weight:900;letter-spacing:.06em;color:#20140a;
   background:linear-gradient(to bottom,#FFD07A,#EDA83C);box-shadow:0 5px 14px rgba(0,0,0,.45)}
-.logo-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 12px}
-.logo-row div{aspect-ratio:1/1;border-radius:10px;display:flex;align-items:center;justify-content:center;
-  background:rgba(255,248,236,.94);padding:6px}
+.brands-label{display:flex;align-items:center;gap:9px;margin:16px 0 2px;
+  font-size:10px;font-weight:800;letter-spacing:.16em;color:var(--gold-l);opacity:.95;white-space:nowrap}
+.brands-label::before,.brands-label::after{content:"";flex:1;height:1px;
+  background:linear-gradient(to right,transparent,rgba(237,168,60,.6),transparent)}
+.logo-row{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin:11px 2px 14px}
+.logo-row div{position:relative;aspect-ratio:1/1;border-radius:50%;padding:15%;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 50% 32%,#FFFDF7 0%,#F6EEDE 62%,#E8DCC4 100%);
+  border:2px solid var(--gold);
+  box-shadow:0 5px 14px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.95);
+  animation:logoPop .5s cubic-bezier(.34,1.5,.64,1) both}
+.logo-row div::after{content:"";position:absolute;inset:5%;border-radius:50%;
+  border:1px solid rgba(201,146,47,.45);pointer-events:none}
+.logo-row div:nth-child(2){animation-delay:.06s}
+.logo-row div:nth-child(3){animation-delay:.12s}
+.logo-row div:nth-child(4){animation-delay:.18s}
+.logo-row div:nth-child(5){animation-delay:.24s}
+.logo-row div:nth-child(6){animation-delay:.3s}
+@keyframes logoPop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
 .logo-row img{width:100%;height:100%;object-fit:contain}
 .sheet .stamp-date{font-size:11px;opacity:.8;margin-bottom:12px}
 </style>
@@ -277,6 +295,7 @@ body{
   </div>
 
   <button id="scanBtn" class="btn" style="display:none">📷 QRコードを読み取る</button>
+  <p id="scanHint" class="scan-hint" style="display:none">各ブースのQRコードを読み取るとスタンプがたまります</p>
   <button id="openComplete" class="btn ghost" style="display:none">🏆 コンプリート画面を見る</button>
 
   <!-- 15. ブランド一覧 -->
@@ -313,6 +332,7 @@ body{
     <div class="hero" id="completeHero"></div>
     <div style="font-size:13.5px;font-weight:800;margin-bottom:2px">乾杯の輪、完成！</div>
     <div class="title-badge">TOYOSU BEER MASTER</div>
+    <div class="brands-label">6 BREWERIES YOU VISITED</div>
     <div class="logo-row" id="completeLogos"></div>
     <div class="stamp-date" id="completeDate"></div>
     <button class="btn" id="shareBtn">📣 記念画像をシェアする</button>
@@ -333,6 +353,8 @@ const CONFIG = {
   // GASウェブアプリのURL（未設定ならlocalStorageのみで動作）
   GAS_ENDPOINT: "https://script.google.com/macros/s/AKfycbzeFGijUO9bFyNakp1ANWpY-BtP3LmfTevKk4NRnTIS1HaxVGjdRkAiung6oCdRS40PJw/exec",
 
+  GAS_TIMEOUT_MS: 8000,   // GAS応答の打ち切り時間
+
   STORAGE_KEY: "toyosu_beer_stamps",   // 旧版と同じキー（既存ユーザーの進捗を引き継ぐ）
   META_KEY: "toyosu_prost_meta",
 
@@ -346,22 +368,24 @@ const CONFIG = {
     logo20th: "./logo-20th.webp",        // アーバンドック ららぽーと豊洲 20周年ロゴ
     logoOkf: "./logo-okf.webp",          // オクトーバーフェスト ロゴ
     confetti: "./confetti.webp",         // 予備（現在はcanvasの紙吹雪を使用）
-    // 乾杯キャラ（透過PNG）。無い場合は自動でプレースホルダーSVGを表示
-    characters: [
-      "./char1.webp","./char2.webp","./char3.webp",
-      "./char4.webp","./char5.webp","./char6.webp"
-    ]
   },
 
   // 3. 対象6ブランド。配列の順がそのまま表示順とBOOTH番号になる。
   //    spot番号はQRの中身（?spot=N）と一対一なので、ここを変えたらQRも作り直すこと。
+  //    char は「そのブランドのジョッキを持ったキャラ」。スタンプと1対1で対応する。
   BREWERIES: [
-    { id:"arcobrau",   spot:1, name:"アルコブロイ",       en:"Arcobräu",       logo:"./logo5.jpg.jpg" },
-    { id:"paulaner",   spot:2, name:"パウラーナー",       en:"Paulaner",       logo:"./logo1.jpg.jpg" },
-    { id:"hofbrau",    spot:3, name:"ホフブロイ",         en:"Hofbräu",        logo:"./logo3.png.png" },
-    { id:"hacker",     spot:4, name:"ハッカー・プショール", en:"Hacker-Pschorr", logo:"./logo2.jpg.jpg" },
-    { id:"hirschbrau", spot:5, name:"ヒルシュブロイ",     en:"Der Hirschbräu", logo:"./logo6.png.png" },
-    { id:"karmeliten", spot:6, name:"カーメリテン",       en:"Karmeliten",     logo:"./logo4.png.png" }
+    { id:"arcobrau",   spot:1, name:"アルコブロイ",       en:"Arcobräu",       person:"アルコブロイさん",
+      logo:"./logo-arcobrau.webp",   char:"./char-arcobrau.webp" },
+    { id:"paulaner",   spot:2, name:"パウラーナー",       en:"Paulaner",       person:"パウラーナーさん",
+      logo:"./logo-paulaner.webp",   char:"./char-paulaner.webp" },
+    { id:"hofbrau",    spot:3, name:"ホフブロイ",         en:"Hofbräu",        person:"ホフブロイさん",
+      logo:"./logo-hofbrau.webp",    char:"./char-hofbrau.webp" },
+    { id:"hacker",     spot:4, name:"ハッカー・プショール", en:"Hacker-Pschorr", person:"ハッカー・プショールさん",
+      logo:"./logo-hacker.webp",     char:"./char-hacker.webp" },
+    { id:"hirschbrau", spot:5, name:"ヒルシュブロイ",     en:"Der Hirschbräu", person:"ヒルシュブロイさん",
+      logo:"./logo-hirschbrau.webp", char:"./char-hirschbrau.webp" },
+    { id:"karmeliten", spot:6, name:"カーメリテン",       en:"Karmeliten",     person:"カーメリテンさん",
+      logo:"./logo-karmeliten.webp", char:"./char-karmeliten.webp" }
   ],
 
   // 10. 人数ごとの配置（x:左からの%、y:床からの%、s:奥行きスケール、w:幅%）
@@ -430,16 +454,21 @@ const Store = {
   },
   async call(action, payload){
     if (!CONFIG.GAS_ENDPOINT) return null;
+    // 通信が返らないときにUIを止めないよう必ず打ち切る
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), CONFIG.GAS_TIMEOUT_MS);
     try {
       const res = await fetch(CONFIG.GAS_ENDPOINT, {
         method: "POST",
         // text/plain にするとプリフライトが飛ばないためGASでもCORSが通る
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(Object.assign({ action, idToken: state.idToken }, payload || {}))
+        body: JSON.stringify(Object.assign({ action, idToken: state.idToken }, payload || {})),
+        signal: ac.signal
       });
       const json = await res.json();
       return json && json.ok ? json : null;
     } catch(e){ console.warn("GAS通信に失敗", e); return null; }
+    finally { clearTimeout(timer); }
   },
   merge(remote){
     if (!remote || !Array.isArray(remote.stamps)) return false;
@@ -510,6 +539,8 @@ function renderBadges(){
   }).join("");
 }
 
+function brewery_state(b){ return b.person + " と乾杯済み 🍺"; }
+
 function renderList(){
   $("list").innerHTML = CONFIG.BREWERIES.map(b => {
     const got = state.stamps.includes(b.spot);
@@ -517,7 +548,7 @@ function renderList(){
       '<div class="thumb"><img src="' + b.logo + '" alt="' + b.en + '"></div>' +
       '<div class="meta"><div class="en">' + b.en + '</div>' +
       '<div class="jp">' + b.name + '</div>' +
-      '<div class="state">' + (got ? "PROST済み 🍺" : "まだPROSTしていません") + '</div></div>' +
+      '<div class="state">' + (got ? brewery_state(b) : "まだPROSTしていません") + '</div></div>' +
       '<div class="booth">BOOTH ' + b.spot + '</div></div>';
   }).join("");
 }
@@ -532,29 +563,32 @@ function renderProgress(){
 }
 
 // 12. 既存キャラは配置を移動、新しいキャラだけ遅れて登場させる
-function renderChars(newIndex){
+function renderChars(newSpot){
   const n = state.stamps.length;
   const wrap = $("chars");
   $("stageEmpty").style.display = n === 0 ? "block" : "none";
   if (n === 0){ wrap.innerHTML = ""; return; }
 
   const layout = CONFIG.LAYOUT[n];
-  const existing = new Map([...wrap.children].map(el => [Number(el.dataset.i), el]));
+  // 取得済みのspotごとに要素を持つ。これでスタンプとキャラが必ず一致する。
+  const existing = new Map([...wrap.children].map(el => [Number(el.dataset.spot), el]));
 
-  // 既存のキャラはDOMに残したまま座標だけ更新するので、新しい配置へなめらかに移動する
-  existing.forEach((el, i) => { if (i >= n) el.remove(); });
+  // 取得していないブランドのキャラは消す
+  existing.forEach((el, sp) => { if (!state.stamps.includes(sp)) el.remove(); });
 
   for (let i = 0; i < n; i++){
     const pos = layout[i];
-    let el = existing.get(i);
+    const spot = state.stamps[i];
+    const brewery = bySpot(spot);
+    let el = existing.get(spot);
     const isNew = !el;
     if (isNew){
       el = document.createElement("div");
       el.className = "char";
-      el.dataset.i = i;
+      el.dataset.spot = spot;
       const img = document.createElement("img");
-      img.alt = "";
-      img.src = CONFIG.ASSETS.characters[i];
+      img.alt = brewery ? brewery.person : "";
+      img.src = brewery ? brewery.char : "";
       img.onerror = () => { img.onerror = null; img.src = placeholderChar(i); };
       el.appendChild(img);
       wrap.appendChild(el);
@@ -569,12 +603,12 @@ function renderChars(newIndex){
     el.style.transform = "translate(-50%,0) scale(" + pos.s + ")";
     el.style.zIndex = Math.round(pos.s * 10);
     // 12. 新しい仲間だけ少し遅れて登場させる
-    if (i === newIndex && isNew) requestAnimationFrame(() => el.classList.add("enter"));
+    if (spot === newSpot && isNew) requestAnimationFrame(() => el.classList.add("enter"));
   }
 }
 
-function render(newIndex){
-  renderBadges(); renderList(); renderProgress(); renderChars(newIndex);
+function render(newSpot){
+  renderBadges(); renderList(); renderProgress(); renderChars(newSpot);
 }
 
 /* ---------------------------------------------------------------
@@ -613,7 +647,6 @@ async function getStamp(spot){
   }
 
   state.busy = true;
-  const newIndex = state.stamps.length;         // 何人目として登場するか
   state.stamps.push(brewery.spot);
   state.stamps.sort((a,b)=>a-b);
   state.acquiredAt[brewery.spot] = new Date().toISOString();
@@ -622,14 +655,14 @@ async function getStamp(spot){
   Store.saveLocal();
 
   // 新しい仲間が登場 → 全員でPROST
-  renderChars(newIndex);
+  renderChars(brewery.spot);
   renderProgress();
   setTimeout(playProst, 520);
 
   // メーカー名表示
   setTimeout(() => {
     const bn = $("getBanner");
-    bn.textContent = brewery.en.toUpperCase() + " GET！";
+    bn.textContent = brewery.person + " と乾杯！";
     bn.classList.remove("go"); void bn.offsetWidth; bn.classList.add("go");
   }, 1500);
 
@@ -662,10 +695,10 @@ function openComplete(){
       hero.textContent = "";
       const row = document.createElement("div");
       row.className = "hero-fallback";
-      CONFIG.ASSETS.characters.forEach((src, i) => {
+      CONFIG.BREWERIES.forEach((b, i) => {
         const c = document.createElement("img");
-        c.alt = "";
-        c.src = src;
+        c.alt = b.person;
+        c.src = b.char;
         c.onerror = () => { c.onerror = null; c.src = placeholderChar(i); };
         row.appendChild(c);
       });
@@ -738,11 +771,11 @@ async function buildShareImage(){
   ctx.font = "600 30px sans-serif";
   ctx.fillText("OKTOBERFEST 2026 in アーバンドック ららぽーと豊洲", W/2, 1000);
   // キャラを横一列に
-  const imgs = await Promise.all(CONFIG.ASSETS.characters.map((src,i) => new Promise(res => {
+  const imgs = await Promise.all(CONFIG.BREWERIES.map((b,i) => new Promise(res => {
     const im = new Image();
     im.onload = () => res(im);
     im.onerror = () => { const p = new Image(); p.onload = () => res(p); p.src = placeholderChar(i); };
-    im.src = src;
+    im.src = b.char;
   })));
   const cw = W / 6.4;
   imgs.forEach((im,i) => {
@@ -768,6 +801,40 @@ $("shareBtn").addEventListener("click", async () => {
     }
   } catch(e){ toast("画像の生成に失敗しました。もう一度お試しください。"); }
 });
+
+/* ---------------------------------------------------------------
+   QR読み取りボタン
+   scanCodeV2 はLINEアプリ内でのみ使えるため、外部ブラウザでは
+   ボタンを出さずに案内文に切り替える。
+   --------------------------------------------------------------- */
+function setupScanButton(){
+  const btn = $("scanBtn"), hint = $("scanHint");
+  const usable = typeof liff !== "undefined" &&
+                 typeof liff.scanCodeV2 === "function" &&
+                 typeof liff.isInClient === "function" && liff.isInClient();
+  if (!usable){
+    btn.style.display = "none";
+    hint.style.display = "block";
+    return;
+  }
+  hint.style.display = "none";
+  btn.style.display = "block";
+  if (btn.dataset.bound) return;
+  btn.dataset.bound = "1";
+  btn.addEventListener("click", async () => {
+    try {
+      const result = await liff.scanCodeV2();
+      if (!result || !result.value) return;
+      let spot = null;
+      try { spot = new URL(result.value).searchParams.get("spot"); } catch(e){}
+      if (spot) getStamp(spot);
+      else toast("このQRコードはスタンプラリー用ではありません。");
+    } catch(err){
+      console.error(err);
+      toast("カメラを起動できませんでした。<br><small>各ブースのQRコードを直接読み取ってください</small>");
+    }
+  });
+}
 
 /* ---------------------------------------------------------------
    起動
@@ -830,6 +897,10 @@ async function startApp(){
     $("greet").textContent = profile.displayName +
       (state.stamps.length > 0 ? " さん、前回の続きからPROST！🍻" : " さん、PROST！🍻");
 
+    // QR読み取りボタンはGASの応答を待たずに出す。
+    // 待たせるとアプリを開いてから数秒間ボタンが無い状態になってしまう。
+    setupScanButton();
+
     // 18. 次回来場対応：サーバー側の進捗を取り込む
     // ?spot= がある場合はここで待たない。GASの応答を待つとQRを読んでから
     // スタンプが出るまで数秒かかってしまうため、取得を先に通す。
@@ -841,19 +912,6 @@ async function startApp(){
         if (state.stamps.length > 0) $("greet").textContent = profile.displayName + " さん、前回の続きからPROST！🍻";
       }
     }
-
-    const scanBtn = $("scanBtn");
-    scanBtn.style.display = "block";
-    scanBtn.addEventListener("click", async () => {
-      try {
-        const result = await liff.scanCodeV2();
-        if (!result || !result.value) return;
-        let spot = null;
-        try { spot = new URL(result.value).searchParams.get("spot"); } catch(e){}
-        if (spot) getStamp(spot);
-        else toast("このQRコードはスタンプラリー用ではありません。");
-      } catch(err){ console.error(err); }
-    });
   } catch(error){
     console.error("LIFF初期化エラー", error);
     $("greet").textContent = "LINEアプリ内で開くと進捗が保存されます";
