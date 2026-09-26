@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0b2a50">
+<title>管理画面｜6 BREWERIES PROST</title>
+<style>
+:root{
+  --navy:#12457f; --navy-d:#0b2a50; --gold:#EDA83C; --gold-l:#FFE3B0;
+  --bg:#f4f6fa; --card:#fff; --ink:#1b2433; --sub:#64708a; --line:#e3e8f0;
+  --ok:#2f9a5f; --warn:#c8761b; --bar:#2f6fb8;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif;
+  background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5}
+header{background:linear-gradient(#12457f,#0b2a50);color:#fff;border-bottom:3px solid var(--gold)}
+.hwrap{max-width:1100px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+header h1{font-size:16px;margin:0;letter-spacing:.04em}
+header .sub{font-size:12px;opacity:.75}
+header .sp{flex:1}
+.btn{border:0;border-radius:8px;padding:9px 14px;font-weight:700;font-size:13px;cursor:pointer;
+  background:var(--gold);color:#2a1a05}
+.btn.ghost{background:transparent;color:inherit;border:1px solid currentColor;opacity:.85}
+.btn:disabled{opacity:.5;cursor:default}
+main{max-width:1100px;margin:0 auto;padding:16px}
+
+/* login */
+.login{max-width:360px;margin:12vh auto 0;background:var(--card);border-radius:14px;padding:28px 24px;
+  box-shadow:0 6px 24px rgba(11,42,80,.12);text-align:center}
+.login h2{margin:0 0 4px;font-size:18px;color:var(--navy-d)}
+.login p{margin:0 0 18px;color:var(--sub);font-size:12px}
+.login input{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;font-size:16px;margin-bottom:12px;text-align:center;letter-spacing:.1em}
+.login .btn{width:100%;padding:12px}
+.err{color:#c0392b;font-size:12px;min-height:18px;margin-top:10px}
+
+/* dashboard */
+.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px;color:var(--sub);font-size:12px}
+.toolbar label{display:flex;gap:6px;align-items:center;cursor:pointer;color:var(--ink);font-size:13px}
+.toolbar .sp{flex:1}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--card);border-radius:12px;padding:14px;border:1px solid var(--line)}
+.kpi .l{font-size:12px;color:var(--sub)}
+.kpi .v{font-size:28px;font-weight:800;color:var(--navy-d);font-variant-numeric:tabular-nums;line-height:1.2}
+.kpi .v small{font-size:13px;font-weight:600;color:var(--sub);margin-left:4px}
+.kpi.hl{border-color:var(--gold);background:#fffaf0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--card);border-radius:12px;border:1px solid var(--line);padding:16px;margin-bottom:14px;min-width:0}
+.grid2 .card{margin-bottom:0}
+.card h3{margin:0 0 12px;font-size:14px;color:var(--navy-d);display:flex;align-items:center;gap:8px}
+.card h3 .note{font-weight:400;color:var(--sub);font-size:12px}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar{display:grid;grid-template-columns:120px 1fr 64px;gap:8px;align-items:center;font-size:13px}
+.bar .t{height:18px;background:#eef2f8;border-radius:4px;overflow:hidden}
+.bar .f{height:100%;background:var(--bar);border-radius:4px;min-width:2px}
+.bar .f.gold{background:var(--gold)}
+.bar .n{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.bar .n span{font-weight:400;color:var(--sub);font-size:11px;margin-left:3px}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{font-size:12px;color:var(--sub);font-weight:600;background:#f8fafc;position:sticky;top:0}
+td.r,th.r{text-align:right}
+tbody tr:hover{background:#f8fafc}
+.pill{display:inline-block;padding:1px 8px;border-radius:99px;font-size:11px;font-weight:700}
+.pill.ok{background:#e3f4ea;color:var(--ok)}
+.pill.wait{background:#fff1dc;color:var(--warn)}
+.pill.no{background:#eef2f8;color:var(--sub)}
+.dots{letter-spacing:2px;font-size:12px}
+.dots b{color:var(--bar)} .dots i{color:#cfd7e3;font-style:normal}
+.search{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;min-width:180px}
+.tabs{display:flex;gap:6px;margin-left:auto}
+.tabs button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 12px;font-size:12px;cursor:pointer;color:var(--sub)}
+.tabs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.scroll{max-height:460px;overflow:auto}
+.hidden{display:none!important}
+.empty{color:var(--sub);text-align:center;padding:20px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hwrap">
+    <div>
+      <h1>6 BREWERIES PROST 管理画面</h1>
+      <div class="sub">オクトーバーフェスト2026 in アーバンドック ららぽーと豊洲</div>
+    </div>
+    <div class="sp"></div>
+    <button class="btn ghost hidden" id="logoutBtn">ログアウト</button>
+  </div>
+</header>
+
+<main>
+  <!-- ログイン -->
+  <section class="login" id="loginView">
+    <h2>管理者ログイン</h2>
+    <p>パスワードを入力してください</p>
+    <form id="loginForm">
+      <input type="password" id="pw" autocomplete="current-password" placeholder="パスワード" required>
+      <button class="btn" id="loginBtn" type="submit">ログイン</button>
+    </form>
+    <div class="err" id="loginErr"></div>
+  </section>
+
+  <!-- ダッシュボード -->
+  <section class="hidden" id="dashView">
+    <div class="toolbar">
+      <label><input type="checkbox" id="excludeTest" checked> 開催前（9/17以前）のテスト参加を除外</label>
+      <span class="sp"></span>
+      <span id="updated">—</span>
+      <button class="btn" id="reloadBtn">更新</button>
+    </div>
+
+    <div class="kpis" id="kpis"></div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>スタンプ数の分布 <span class="note">現在何個持っているか</span></h3>
+        <div class="bars" id="distBars"></div>
+      </div>
+      <div class="card">
+        <h3>ブランド別 スタンプ取得数</h3>
+        <div class="bars" id="boothBars"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>日別推移 <span class="note">日本時間</span></h3>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>日付</th><th class="r">新規参加</th><th class="r">スタンプ取得</th><th class="r">コンプリート</th><th class="r">ジョッキ引換</th></tr></thead>
+        <tbody id="dailyBody"></tbody>
+      </table></div>
+    </div>
+
+    <div class="card">
+      <h3>引換記録 <span class="note">スプレッドシート「引換記録」シートに自動で追記保存</span>
+        <span class="sp" style="flex:1"></span>
+        <button class="btn ghost" style="color:var(--navy)" id="csvRedeem">CSV</button>
+      </h3>
+      <div class="scroll tbl-wrap"><table>
+        <thead><tr><th>#</th><th>引換日時</th><th>コンプリート日時</th><th>userId</th><th>スタンプ</th></tr></thead>
+        <tbody id="redeemBody"></tbody>
+      </table></div>
+    </div>
+
+    <div class="card">
+      <h3>参加者一覧
+        <div class="tabs" id="userTabs">
+          <button data-f="all" class="on">すべて</button>
+          <button data-f="wait">コンプ・未引換</button>
+          <button data-f="done">引換済み</button>
+          <button data-f="prog">途中</button>
+        </div>
+      </h3>
+      <div class="toolbar" style="margin-bottom:10px">
+        <input class="search" id="userSearch" placeholder="userId の一部で検索">
+        <span class="sp"></span>
+        <button class="btn ghost" style="color:var(--navy)" id="csvUsers">CSV</button>
+      </div>
+      <div class="scroll tbl-wrap"><table>
+        <thead><tr><th>userId</th><th>スタンプ</th><th class="r">個数</th><th>初回取得</th><th>最終取得</th><th>状態</th></tr></thead>
+        <tbody id="userBody"></tbody>
+      </table></div>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ===================================================================
+   設定：gas/admin.gs を「ウェブアプリ」でデプロイしたURLを入れる
+   パスワード判定はGAS側で行うため、このファイルにパスワードは書かない
+   =================================================================== */
+const ADMIN_ENDPOINT = "__ADMIN_ENDPOINT__";
+const EVENT_START = "2026-09-18"; // この日（日本時間）より前に始めた参加者はテスト扱い
+const AUTO_REFRESH_MS = 60000;
+const BREWERIES = [
+  { spot:1, name:"アルコブロイ" }, { spot:2, name:"パウラーナー" }, { spot:3, name:"ホフブロイ" },
+  { spot:4, name:"ハッカー・プショール" }, { spot:5, name:"ヒルシュブロイ" }, { spot:6, name:"カーメリテン" }
+];
+const SS_KEY = "toyosu_admin_pw";
+
+const $ = (id) => document.getElementById(id);
+let data = null, pw = "", timer = null, userFilter = "all";
+
+/* ---------- 日付 ---------- */
+const fmtJst = new Intl.DateTimeFormat("ja-JP", { timeZone:"Asia/Tokyo", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+const fmtDay = new Intl.DateTimeFormat("en-CA", { timeZone:"Asia/Tokyo", year:"numeric", month:"2-digit", day:"2-digit" });
+const dayJst = (iso) => iso ? fmtDay.format(new Date(iso)) : "";
+const dt = (iso) => { if (!iso) return ""; const d = new Date(iso); return isNaN(d) ? iso : fmtJst.format(d); };
+const wd = (day) => "日月火水木金土"[new Date(day + "T00:00:00+09:00").getDay()];
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+const pct = (a, b) => b ? Math.round(a / b * 1000) / 10 : 0;
+
+/* ---------- 通信 ---------- */
+async function fetchData(password){
+  const res = await fetch(ADMIN_ENDPOINT, {
+    method:"POST",
+    headers:{ "Content-Type":"text/plain;charset=utf-8" },
+    body: JSON.stringify({ password })
+  });
+  return res.json();
+}
+
+async function login(password, silent){
+  if (ADMIN_ENDPOINT.startsWith("__")){ $("loginErr").textContent = "管理API（GAS）のURLが未設定です"; return; }
+  $("loginBtn").disabled = true;
+  if (!silent) $("loginErr").textContent = "確認中…";
+  try {
+    const r = await fetchData(password);
+    if (!r.ok){
+      $("loginErr").textContent = r.error === "locked"
+        ? "ログイン失敗が続いたため10分間ロックされています"
+        : "パスワードが違います";
+      try { sessionStorage.removeItem(SS_KEY); } catch(e){}
+      showLogin();
+      return;
+    }
+    pw = password;
+    try { sessionStorage.setItem(SS_KEY, password); } catch(e){}
+    data = r;
+    $("loginErr").textContent = "";
+    showDash();
+  } catch(e){
+    $("loginErr").textContent = "通信に失敗しました。時間をおいて再度お試しください";
+    showLogin();
+  } finally {
+    $("loginBtn").disabled = false;
+  }
+}
+
+async function reload(){
+  if (!pw) return;
+  $("reloadBtn").disabled = true;
+  $("updated").textContent = "更新中…";
+  try {
+    const r = await fetchData(pw);
+    if (r.ok){ data = r; render(); }
+    else if (r.error === "auth") logout();
+  } catch(e){
+    $("updated").textContent = "更新に失敗しました";
+  } finally { $("reloadBtn").disabled = false; }
+}
+
+function showLogin(){
+  $("loginView").classList.remove("hidden");
+  $("dashView").classList.add("hidden");
+  $("logoutBtn").classList.add("hidden");
+  clearInterval(timer);
+}
+function showDash(){
+  $("loginView").classList.add("hidden");
+  $("dashView").classList.remove("hidden");
+  $("logoutBtn").classList.remove("hidden");
+  render();
+  clearInterval(timer);
+  timer = setInterval(reload, AUTO_REFRESH_MS);
+}
+function logout(){
+  pw = ""; data = null;
+  try { sessionStorage.removeItem(SS_KEY); } catch(e){}
+  $("pw").value = "";
+  showLogin();
+}
+
+/* ---------- 集計 ---------- */
+function firstAt(u){
+  const t = Object.values(u.acquiredAt || {}).filter(Boolean).sort();
+  return t[0] || u.updatedAt || "";
+}
+function lastAt(u){
+  const t = Object.values(u.acquiredAt || {}).filter(Boolean).sort();
+  return t[t.length - 1] || u.updatedAt || "";
+}
+function isTestUser(u){
+  const f = firstAt(u);
+  return f && dayJst(f) < EVENT_START;
+}
+
+function compute(){
+  const exclude = $("excludeTest").checked;
+  const users = data.users.filter(u => u.stamps.length > 0 && !(exclude && isTestUser(u)));
+  const testIds = new Set(data.users.filter(isTestUser).map(u => u.userId));
+  const redeems = data.redeemLog
+    .filter(r => r.redeemedAt && !(exclude && (testIds.has(r.userId) || dayJst(r.redeemedAt) < EVENT_START)))
+    .sort((a, b) => a.redeemedAt < b.redeemedAt ? -1 : 1);
+
+  const total = users.length;
+  const stamps = users.reduce((s, u) => s + u.stamps.length, 0);
+  const complete = users.filter(u => u.stamps.length >= 6).length;
+  const redeemedNow = new Set(users.filter(u => u.redeemedAt).map(u => u.userId));
+  const waiting = users.filter(u => u.stamps.length >= 6 && !u.redeemedAt).length;
+
+  const dist = [1,2,3,4,5,6].map(n => users.filter(u => u.stamps.length === n).length);
+  const booth = BREWERIES.map(b => users.filter(u => u.stamps.includes(b.spot)).length);
+
+  // 日別
+  const days = {};
+  const bump = (day, k) => { if (!day) return; (days[day] ||= { join:0, stamp:0, comp:0, red:0 })[k]++; };
+  users.forEach(u => {
+    bump(dayJst(firstAt(u)), "join");
+    Object.values(u.acquiredAt || {}).forEach(t => bump(dayJst(t), "stamp"));
+    if (u.stamps.length >= 6 && u.completedAt) bump(dayJst(u.completedAt), "comp");
+  });
+  redeems.forEach(r => bump(dayJst(r.redeemedAt), "red"));
+
+  return { users, redeems, total, stamps, complete, waiting, redeemedNow, dist, booth, days };
+}
+
+/* ---------- 描画 ---------- */
+function bars(el, rows, max, gold){
+  el.innerHTML = rows.map(r => `
+    <div class="bar">
+      <div>${esc(r.label)}</div>
+      <div class="t"><div class="f ${gold && r.gold ? "gold" : ""}" style="width:${max ? r.v / max * 100 : 0}%"></div></div>
+      <div class="n">${r.v}<span>${r.sub ?? ""}</span></div>
+    </div>`).join("");
+}
+
+function render(){
+  if (!data) return;
+  const c = compute();
+  $("updated").textContent = "最終更新 " + dt(data.generatedAt);
+
+  $("kpis").innerHTML = [
+    { l:"参加者数", v:c.total, u:"人" },
+    { l:"スタンプ総数", v:c.stamps, u:"個" },
+    { l:"平均スタンプ数", v:c.total ? (c.stamps / c.total).toFixed(1) : "0.0", u:"個/人" },
+    { l:"コンプリート", v:c.complete, u:`人（${pct(c.complete, c.total)}%）` },
+    { l:"ジョッキ引換", v:c.redeems.length, u:"件", hl:true },
+    { l:"コンプ済み・未引換", v:c.waiting, u:"人" }
+  ].map(k => `<div class="kpi ${k.hl ? "hl" : ""}"><div class="l">${k.l}</div><div class="v">${k.v}<small>${k.u}</small></div></div>`).join("");
+
+  const dmax = Math.max(...c.dist, 1);
+  bars($("distBars"), c.dist.map((v, i) => ({ label:`${i + 1}個`, v, sub:`${pct(v, c.total)}%`, gold:i === 5 })), dmax, true);
+  const bmax = Math.max(...c.booth, 1);
+  bars($("boothBars"), c.booth.map((v, i) => ({ label:BREWERIES[i].name, v, sub:`${pct(v, c.total)}%` })), bmax);
+
+  const dayKeys = Object.keys(c.days).sort().reverse();
+  const sum = { join:0, stamp:0, comp:0, red:0 };
+  dayKeys.forEach(d => Object.keys(sum).forEach(k => sum[k] += c.days[d][k]));
+  $("dailyBody").innerHTML = dayKeys.length ? dayKeys.map(d => {
+    const r = c.days[d];
+    return `<tr><td>${d.slice(5).replace("-", "/")}（${wd(d)}）</td><td class="r">${r.join}</td><td class="r">${r.stamp}</td><td class="r">${r.comp}</td><td class="r">${r.red}</td></tr>`;
+  }).join("") + `<tr style="font-weight:700;background:#f8fafc"><td>合計</td><td class="r">${sum.join}</td><td class="r">${sum.stamp}</td><td class="r">${sum.comp}</td><td class="r">${sum.red}</td></tr>`
+  : `<tr><td colspan="5" class="empty">データがありません</td></tr>`;
+
+  $("redeemBody").innerHTML = c.redeems.length ? c.redeems.slice().reverse().map((r, i) => `
+    <tr><td>${c.redeems.length - i}</td><td>${dt(r.redeemedAt)}</td><td>${esc(dt(r.completedAt))}</td>
+    <td title="${esc(r.userId)}">…${esc(r.userId.slice(-8))}</td><td>${esc(r.stamps)}</td></tr>`).join("")
+    : `<tr><td colspan="5" class="empty">まだ引換はありません</td></tr>`;
+
+  renderUsers(c);
+}
+
+function stateOf(u){
+  if (u.redeemedAt) return "done";
+  if (u.stamps.length >= 6) return "wait";
+  return "prog";
+}
+function renderUsers(c){
+  c = c || compute();
+  const q = $("userSearch").value.trim().toLowerCase();
+  const list = c.users
+    .filter(u => userFilter === "all" || stateOf(u) === userFilter)
+    .filter(u => !q || u.userId.toLowerCase().includes(q))
+    .sort((a, b) => lastAt(a) < lastAt(b) ? 1 : -1);
+  const pill = { done:'<span class="pill ok">引換済み</span>', wait:'<span class="pill wait">コンプ・未引換</span>', prog:'<span class="pill no">途中</span>' };
+  $("userBody").innerHTML = list.length ? list.map(u => `
+    <tr><td title="${esc(u.userId)}">…${esc(u.userId.slice(-8))}</td>
+    <td class="dots">${[1,2,3,4,5,6].map(n => u.stamps.includes(n) ? "<b>●</b>" : "<i>●</i>").join("")}</td>
+    <td class="r">${u.stamps.length}</td><td>${dt(firstAt(u))}</td><td>${dt(lastAt(u))}</td><td>${pill[stateOf(u)]}</td></tr>`).join("")
+    : `<tr><td colspan="6" class="empty">該当なし</td></tr>`;
+}
+
+/* ---------- CSV ---------- */
+function downloadCsv(name, rows){
+  const csv = "﻿" + rows.map(r => r.map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")).join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], { type:"text/csv" }));
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+const stamp = () => fmtDay.format(new Date()).replace(/-/g, "");
+
+/* ---------- イベント ---------- */
+$("loginForm").addEventListener("submit", (e) => { e.preventDefault(); login($("pw").value.trim()); });
+$("logoutBtn").addEventListener("click", logout);
+$("reloadBtn").addEventListener("click", reload);
+$("excludeTest").addEventListener("change", render);
+$("userSearch").addEventListener("input", () => renderUsers());
+$("userTabs").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  userFilter = b.dataset.f;
+  [...$("userTabs").children].forEach(x => x.classList.toggle("on", x === b));
+  renderUsers();
+});
+$("csvRedeem").addEventListener("click", () => {
+  const c = compute();
+  downloadCsv(`引換記録_${stamp()}.csv`, [["No","引換日時(JST)","コンプリート日時","userId","スタンプ"]]
+    .concat(c.redeems.map((r, i) => [i + 1, dt(r.redeemedAt), dt(r.completedAt), r.userId, r.stamps])));
+});
+$("csvUsers").addEventListener("click", () => {
+  const c = compute();
+  downloadCsv(`参加者一覧_${stamp()}.csv`, [["userId","スタンプ","個数","初回取得","最終取得","コンプリート","引換"]]
+    .concat(c.users.map(u => [u.userId, u.stamps.join(" "), u.stamps.length, dt(firstAt(u)), dt(lastAt(u)), dt(u.completedAt), dt(u.redeemedAt)])));
+});
+
+/* 同じタブ内なら再読み込みしてもログインを保つ（タブを閉じると消える） */
+(function init(){
+  let saved = "";
+  try { saved = sessionStorage.getItem(SS_KEY) || ""; } catch(e){}
+  if (saved) login(saved, true);
+})();
+</script>
+</body>
+</html>
