@@ -28,6 +28,17 @@ body{
 .app{max-width:480px;margin:0 auto;padding:0 14px calc(28px + env(safe-area-inset-bottom))}
 
 /* ---------- 6. ヘッダー ---------- */
+/* ---------- 終了のお知らせ（開いたら必ず出す） ---------- */
+#endedModal{z-index:95}   /* 他のポップアップより必ず前に出す */
+.ended-sheet{max-width:360px;text-align:center}
+.ended-sheet .ended-logos{display:flex;align-items:center;justify-content:center;gap:12px;
+  margin-bottom:12px;opacity:.95}
+.ended-sheet .ended-logos img{height:40px;width:auto}
+.ended-sheet b{display:block;font-size:clamp(16px,4.8vw,19px);font-weight:900;line-height:1.65;
+  color:var(--gold-l);text-shadow:0 2px 0 var(--amber)}
+.ended-sheet p{margin:12px 0 0;font-size:12.5px;line-height:1.85;opacity:.88}
+.ended-sheet .ended-venue{margin-top:14px;padding-top:12px;font-size:10.5px;line-height:1.7;
+  opacity:.6;border-top:1px solid rgba(237,168,60,.35)}
 .header{position:relative;margin:0 -14px 14px;padding:18px 16px 16px;text-align:center;
   background:linear-gradient(to bottom,#12457f,#0e3462);
   border-bottom:3px solid var(--gold);
@@ -432,6 +443,20 @@ body{
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- 終了のお知らせ。アプリを開くたびに最初に出る -->
+<div class="modal" id="endedModal">
+  <div class="sheet ended-sheet">
+    <div class="ended-logos">
+      <img id="endedLogo20" alt="">
+      <img id="endedLogoOkf" alt="">
+    </div>
+    <b>ご好評につき<br>スタンプラリーは終了しました。</b>
+    <p>たくさんのご参加をありがとうございました。<br>またのご来場をお待ちしております。</p>
+    <div class="ended-venue">OKTOBERFEST 2026 in アーバンドック ららぽーと豊洲</div>
+    <button class="btn" id="endedClose">閉じる</button>
+  </div>
+</div>
 
 <!-- 13-2. 取得ポップアップ（ステージと進捗をここへ移して見せる） -->
 <div class="modal get-modal" id="getModal">
@@ -1352,6 +1377,19 @@ function setupScanButton(){
     ring.onerror = () => { ring.remove(); };
     ring.src = CONFIG.ASSETS.badgeRing;
   }
+})();
+
+/* 終了のお知らせ。LIFFの確認を待たずに、開いた瞬間に出す */
+(function showEnded(){
+  const l20 = $("endedLogo20"), lokf = $("endedLogoOkf");
+  [[l20, CONFIG.ASSETS.logo20th], [lokf, CONFIG.ASSETS.logoOkf]].forEach(([el, src]) => {
+    if (!el) return;
+    if (!src) { el.remove(); return; }
+    el.onerror = () => el.remove();
+    el.src = src;
+  });
+  $("endedModal").classList.add("open");
+  $("endedClose").addEventListener("click", () => $("endedModal").classList.remove("open"));
 })();
 
 async function startApp(){
